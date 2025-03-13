@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeSH | Vertical Expandable Tree</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+		
+		
+		* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	scroll-behavior: smooth;
+	/* border: 1px solid red!important; */
+}
+		
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .mesh-wrapper {
+            padding: 50px 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .mesh-item {
+            padding: 1rem;
+            border: solid 1px #ccc;
+            display: block;
+        }
+        .mesh-tag {
+            cursor: pointer;
+            color: black;
+            background-color: #efefef;
+            padding: 5px 10px;
+            display: inline-block;
+            margin:0 5px 5px 0 ;
+        }
+        .category-search {
+            margin-top: 20px;
+        }
+        .tree {
+            list-style-type: none;
+            padding-left: 20px;
+            position: relative;
+        }
+        .tree li {
+            cursor: pointer;
+            margin: 5px 0;
+            position: relative;
+        }
+        .nested {
+            list-style-type: none;
+            padding-left: 20px;
+            display: block;
+        }
+        .toggle-icon {
+            margin-left: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .search-box {
+            margin: 30px 0 30px 0;
+            padding: 5px;
+            width: 100%;
+        }
+        .search-results div {
+            cursor: pointer;
+            padding: 5px;
+            background-color: #efefef;
+            margin: 5px 0;
+        }
+		.mesh-item {
+			margin-bottom: 30px;
+		}
+		.category-tags {
+			margin-bottom: 30px;
+		}
+    </style>
+</head>
+
+<body>
+    <div class="mesh-wrapper">
+        <h2>Categories</h2>
+  
+
+        <input type="text" id="categorySearch" class="search-box" placeholder="Search categories...">
+        <div id="searchResults" class="search-results"></div>
+		
+		
+		
+		  <div id="categoryTags" class="category-tags">
+            <div class="mesh-tag" data-category="breast-cancer">Breast Cancer <i class="fa-solid fa-xmark"></i></div>
+            <div class="mesh-tag" data-category="palliative-care">Palliative Care <i class="fa-solid fa-xmark"></i></div>
+        </div>
+
+        <div id="items">
+            <div class="mesh-item" data-category="breast-cancer">
+                <h3>Breast Cancer</h3>
+                <ul class="tree">
+                    <li onclick="toggle(event, this)"> Diseases [C]<span class="toggle-icon">➖</span>
+                        <ul class="nested">
+                            <li onclick="toggle(event, this)">Neoplasms [C04] <span class="toggle-icon">➖</span>
+                                <ul class="nested">
+                                    <li onclick="toggle(event, this)">Neoplasms by Site [C04.588] <span class="toggle-icon">➖</span>
+                                        <ul class="nested">
+                                            <li onclick="toggle(event, this)">Breast Neoplasms [C04.588.180] <span class="toggle-icon">➖</span>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="mesh-item" data-category="palliative-care">
+                <h3>Palliative Care</h3>
+                <ul class="tree">
+                    <li onclick="toggle(event, this)"> Analytical, Diagnostic and Therapeutic Techniques and Equipment [E]<span class="toggle-icon">➖</span>
+                        <ul class="nested">
+                            <li onclick="toggle(event, this)">Therapeutics [E02] <span class="toggle-icon">➖</span>
+                                <ul class="nested">
+                                    <li onclick="toggle(event, this)">Patient Care [E02.760] <span class="toggle-icon">➖</span>
+                                        <ul class="nested">
+                                            <li onclick="toggle(event, this)">Palliative Care [E02.760.666] <span class="toggle-icon">➖</span>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggle(event, element) {
+            event.stopPropagation();
+            let nestedList = element.querySelector(".nested");
+            let icon = element.querySelector(".toggle-icon");
+            if (nestedList) {
+                let isVisible = nestedList.style.display !== "none";
+                nestedList.style.display = isVisible ? "none" : "block";
+                icon.textContent = isVisible ? "➕" : "➖";
+            }
+        }
+        
+        document.querySelectorAll(".mesh-tag").forEach(tag => {
+            tag.addEventListener("click", function () {
+                let category = this.getAttribute("data-category");
+                document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "none";
+                this.style.display = "none";
+            });
+        });
+        
+        document.getElementById("categorySearch").addEventListener("input", function () {
+            let searchResults = document.getElementById("searchResults");
+            searchResults.innerHTML = "";
+            let searchTerm = this.value.toLowerCase();
+            let categories = ["breast-cancer", "palliative-care"];
+            let filtered = categories.filter(cat => cat.replace('-', ' ').toLowerCase().includes(searchTerm));
+            
+            filtered.forEach(cat => {
+                let result = document.createElement("div");
+                result.textContent = cat.replace('-', ' ');
+                result.setAttribute("data-category", cat);
+                result.addEventListener("click", function () {
+                    let category = this.getAttribute("data-category");
+                    document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "block";
+                    document.querySelector(`.mesh-tag[data-category='${category}']`).style.display = "inline-block";
+                    searchResults.innerHTML = "";
+                    document.getElementById("categorySearch").value = "";
+                });
+                searchResults.appendChild(result);
+            });
+        });
+    </script>
+</body>
+</html>
