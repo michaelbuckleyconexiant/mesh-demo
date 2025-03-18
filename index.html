@@ -85,6 +85,12 @@
         .category-tags {
             margin-bottom: 30px;
         }
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ccc;
+            margin: 15px 0;
+        }
     </style>
 </head>
 
@@ -105,13 +111,13 @@
 
         <div id="items">
             <div class="mesh-item" data-category="breast-cancer">
-                <h3>Breast Cancer</h3>
+                <h4>Breast Cancer</h4>
                 <ul class="tree">
-                    <li onclick="toggle(event, this)"><input type="checkbox" checked> Diseases [C] <span class="toggle-icon">➖</span>
+                    <li onclick="toggle(event, this)"><input type="checkbox"> Diseases [C] <span class="toggle-icon">➖</span>
                         <ul class="nested">
-                            <li onclick="toggle(event, this)"><input type="checkbox" checked> Neoplasms [C04] <span class="toggle-icon">➖</span>
+                            <li onclick="toggle(event, this)"><input type="checkbox"> Neoplasms [C04] <span class="toggle-icon">➖</span>
                                 <ul class="nested">
-                                    <li onclick="toggle(event, this)"><input type="checkbox" checked> Neoplasms by Site [C04.588] <span class="toggle-icon">➖</span>
+                                    <li onclick="toggle(event, this)"><input type="checkbox"> Neoplasms by Site [C04.588] <span class="toggle-icon">➖</span>
                                         <ul class="nested">
                                             <li onclick="toggle(event, this)"><input type="checkbox" checked> Breast Neoplasms [C04.588.180] <span class="toggle-icon">➖</span></li>
                                         </ul>
@@ -124,13 +130,34 @@
             </div>
 
             <div class="mesh-item" data-category="palliative-care">
-                <h3>Palliative Care</h3>
+                <h4>Palliative Care</h4>
                 <ul class="tree">
-                    <li onclick="toggle(event, this)"><input type="checkbox" checked> Analytical, Diagnostic and Therapeutic Techniques and Equipment [E] <span class="toggle-icon">➖</span>
+                    <li onclick="toggle(event, this)"><input type="checkbox"> Health Care [N] <span class="toggle-icon">➖</span>
                         <ul class="nested">
-                            <li onclick="toggle(event, this)"><input type="checkbox" checked> Therapeutics [E02] <span class="toggle-icon">➖</span>
+                            <li onclick="toggle(event, this)"><input type="checkbox"> Health Care Facilities, Manpower, and Services [N02]​ <span class="toggle-icon">➖</span>
                                 <ul class="nested">
-                                    <li onclick="toggle(event, this)"><input type="checkbox" checked> Patient Care [E02.760] <span class="toggle-icon">➖</span>
+                                    <li onclick="toggle(event, this)"><input type="checkbox"> Health Services [N02.421] <span class="toggle-icon">➖</span>
+                                        <ul class="nested">
+                                            <li onclick="toggle(event, this)"><input type="checkbox"> Patient Care [N02.421.585] <span class="toggle-icon">➖</span></li>
+
+                                            <ul class="nested">
+                                                <li onclick="toggle(event, this)"><input type="checkbox" checked> Palliative Care [N02.421.585.666] <span class="toggle-icon">➖</span></li>
+                                            </ul>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <hr>
+
+                <ul class="tree">
+                    <li onclick="toggle(event, this)"><input type="checkbox"> Analytical, Diagnostic and Therapeutic Techniques and Equipment [E] <span class="toggle-icon">➖</span>
+                        <ul class="nested">
+                            <li onclick="toggle(event, this)"><input type="checkbox"> Therapeutics [E02] <span class="toggle-icon">➖</span>
+                                <ul class="nested">
+                                    <li onclick="toggle(event, this)"><input type="checkbox"> Patient Care [E02.760] <span class="toggle-icon">➖</span>
                                         <ul class="nested">
                                             <li onclick="toggle(event, this)"><input type="checkbox" checked> Palliative Care [E02.760.666] <span class="toggle-icon">➖</span></li>
                                         </ul>
@@ -145,57 +172,64 @@
     </div>
 
     <script>
-        function toggle(event, element) {
-            event.stopPropagation();
-            let nestedList = element.querySelector(".nested");
-            let icon = element.querySelector(".toggle-icon");
-            if (nestedList) {
-                let isVisible = nestedList.style.display !== "none";
-                nestedList.style.display = isVisible ? "none" : "block";
-                icon.textContent = isVisible ? "➕" : "➖";
-            }
-        }
+      function toggle(event, element) {
+    // Prevent toggling when clicking on a checkbox
+    if (event.target.tagName.toLowerCase() === "input" && event.target.type === "checkbox") {
+        return;
+    }
+    
+    event.stopPropagation();
+    let nestedList = element.querySelector(".nested");
+    let icon = element.querySelector(".toggle-icon");
+    
+    if (nestedList) {
+        let isVisible = nestedList.style.display !== "none";
+        nestedList.style.display = isVisible ? "none" : "block";
+        icon.textContent = isVisible ? "➕" : "➖";
+    }
+}
 
-        document.getElementById("categorySearch").addEventListener("input", function () {
-            let searchResults = document.getElementById("searchResults");
+document.getElementById("categorySearch").addEventListener("input", function () {
+    let searchResults = document.getElementById("searchResults");
+    searchResults.innerHTML = "";
+    let searchTerm = this.value.toLowerCase();
+
+    let categories = [
+        { name: "Breast Cancer", id: "breast-cancer" },
+        { name: "Palliative Care", id: "palliative-care" }
+    ];
+
+    let filtered = categories.filter(cat => cat.name.toLowerCase().includes(searchTerm));
+
+    if (searchTerm === "") {
+        document.querySelectorAll(".mesh-item").forEach(item => item.style.display = "none");
+        document.querySelectorAll(".mesh-tag").forEach(tag => tag.style.display = "none");
+        return;
+    }
+
+    filtered.forEach(cat => {
+        let result = document.createElement("div");
+        result.textContent = cat.name;
+        result.setAttribute("data-category", cat.id);
+        result.addEventListener("click", function () {
+            let category = this.getAttribute("data-category");
+            document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "block";
+            document.querySelector(`.mesh-tag[data-category='${category}']`).style.display = "inline-block";
             searchResults.innerHTML = "";
-            let searchTerm = this.value.toLowerCase();
-
-            let categories = [
-                { name: "Breast Cancer", id: "breast-cancer" },
-                { name: "Palliative Care", id: "palliative-care" }
-            ];
-
-            let filtered = categories.filter(cat => cat.name.toLowerCase().includes(searchTerm));
-
-            if (searchTerm === "") {
-                document.querySelectorAll(".mesh-item").forEach(item => item.style.display = "none");
-                document.querySelectorAll(".mesh-tag").forEach(tag => tag.style.display = "none");
-                return;
-            }
-
-            filtered.forEach(cat => {
-                let result = document.createElement("div");
-                result.textContent = cat.name;
-                result.setAttribute("data-category", cat.id);
-                result.addEventListener("click", function () {
-                    let category = this.getAttribute("data-category");
-                    document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "block";
-                    document.querySelector(`.mesh-tag[data-category='${category}']`).style.display = "inline-block";
-                    searchResults.innerHTML = "";
-                    document.getElementById("categorySearch").value = "";
-                });
-                searchResults.appendChild(result);
-            });
+            document.getElementById("categorySearch").value = "";
         });
+        searchResults.appendChild(result);
+    });
+});
 
-        document.querySelectorAll(".mesh-tag").forEach(tag => {
-            tag.addEventListener("click", function () {
-                let category = this.getAttribute("data-category");
-                document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "none";
-                this.style.display = "none";
-            });
-        });
+document.querySelectorAll(".mesh-tag").forEach(tag => {
+    tag.addEventListener("click", function () {
+        let category = this.getAttribute("data-category");
+        document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "none";
+        this.style.display = "none";
+    });
+});
+
     </script>
 </body>
 </html>
