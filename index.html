@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MeSH | Vertical Expandable Tree</title>
+    <title>MeSH Browser</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -28,7 +28,7 @@
         .mesh-item {
             padding: 1rem;
             border: solid 1px #ccc;
-            display: none; /* Initially hide all items */
+            display: none;
             margin-bottom: 30px;
         }
 
@@ -37,7 +37,7 @@
             color: black;
             background-color: #efefef;
             padding: 5px 10px;
-            display: none; /* Hide category tags initially */
+            display: none;
             margin: 0 5px 5px 0;
         }
 
@@ -60,7 +60,7 @@
         .nested {
             list-style-type: none;
             padding-left: 20px;
-            display: block;
+            display: none;
         }
 
         .toggle-icon {
@@ -85,153 +85,464 @@
         .category-tags {
             margin-bottom: 30px;
         }
+
         hr {
             border: none;
             height: 1px;
             background-color: #ccc;
             margin: 15px 0;
         }
+
+        .card-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .card-content {
+            /* No specific styling, but used for consistency */
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            font-size: 20px;
+            z-index: 1000;
+        }
+
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            border-radius: 5px;
+            font-size: 20px;
+            z-index: 1000;
+        }
     </style>
 </head>
 
 <body>
-
     <div class="mesh-wrapper">
-        <p style="background-color: yellow; padding: 10px;"><strong>Demo instructions:</strong> Enter the term "breast cancer" or "palliative care" into the search field, then select the tag.</p>
+        <p style="background-color: yellow; padding: 10px;">
+            <strong>Demo instructions:</strong> Enter a MeSH term (e.g., "breast cancer", "palliative care", or
+            "immune system") into the search field, then select the tag.
+        </p>
         <br>
         <h2>Categories</h2>
-
         <input type="text" id="categorySearch" class="search-box" placeholder="Search categories...">
         <div id="searchResults" class="search-results"></div>
-
         <div id="categoryTags" class="category-tags">
             <div class="mesh-tag" data-category="breast-cancer">Breast Cancer <i class="fa-solid fa-xmark"></i></div>
             <div class="mesh-tag" data-category="palliative-care">Palliative Care <i class="fa-solid fa-xmark"></i></div>
+            <div class="mesh-tag" data-category="immune-system">Immune System <i class="fa-solid fa-xmark"></i></div>
+            <div class="mesh-tag" data-category="open-term">Open Term <i class="fa-solid fa-xmark"></i></div>
         </div>
-
         <div id="items">
             <div class="mesh-item" data-category="breast-cancer">
-                <h4>Breast Cancer</h4>
-                <hr>
-                <ul class="tree">
-                    <li onclick="toggle(event, this)"><input type="checkbox"> Diseases [C] <span class="toggle-icon">➖</span>
-                        <ul class="nested">
-                            <li onclick="toggle(event, this)"><input type="checkbox"> Neoplasms [C04] <span class="toggle-icon">➖</span>
-                                <ul class="nested">
-                                    <li onclick="toggle(event, this)"><input type="checkbox"> Neoplasms by Site [C04.588] <span class="toggle-icon">➖</span>
-                                        <ul class="nested">
-                                            <li onclick="toggle(event, this)"><input type="checkbox" checked> Breast Neoplasms [C04.588.180] <span class="toggle-icon">➖</span></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="mesh-item" data-category="palliative-care">
-                <h4>Palliative Care</h4>
-                <hr>
-                <ul class="tree">
-                    <li onclick="toggle(event, this)"><input type="checkbox"> Health Care [N] <span class="toggle-icon">➖</span>
-                        <ul class="nested">
-                            <li onclick="toggle(event, this)"><input type="checkbox"> Health Care Facilities, Manpower, and Services [N02]​ <span class="toggle-icon">➖</span>
-                                <ul class="nested">
-                                    <li onclick="toggle(event, this)"><input type="checkbox"> Health Services [N02.421] <span class="toggle-icon">➖</span>
-                                        <ul class="nested">
-                                            <li onclick="toggle(event, this)"><input type="checkbox"> Patient Care [N02.421.585] <span class="toggle-icon">➖</span></li>
-
-                                            <ul class="nested">
-                                                <li onclick="toggle(event, this)"><input type="checkbox" checked> Palliative Care [N02.421.585.666] <span class="toggle-icon">➖</span></li>
+                <h4 class="card-title">Breast Cancer</h4>
+                <div class="card-content">
+                    <ul class="tree">
+                        <li onclick="toggle(event, this)">
+                            <input type="checkbox"> Immune System Diseases [C20] <span class="toggle-icon">➖</span>
+                            <ul class="nested" style="display: block;">
+                                <li onclick="toggle(event, this)">
+                                    <input type="checkbox"> Neoplasms [C04] <span class="toggle-icon">➖</span>
+                                    <ul class="nested" style="display: block;">
+                                        <li onclick="toggle(event, this)">
+                                            <input type="checkbox"> Neoplasms by Site [C04.588] <span
+                                                class="toggle-icon">➖</span>
+                                            <ul class="nested" style="display: block;">
+                                                <li onclick="toggle(event, this)">
+                                                    <input type="checkbox" checked> Breast Neoplasms [C04.588.180]
+                                                    <span class="toggle-icon">➖</span>
+                                                </li>
                                             </ul>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <hr>
-
-                <ul class="tree">
-                    <li onclick="toggle(event, this)"><input type="checkbox"> Analytical, Diagnostic and Therapeutic Techniques and Equipment [E] <span class="toggle-icon">➖</span>
-                        <ul class="nested">
-                            <li onclick="toggle(event, this)"><input type="checkbox"> Therapeutics [E02] <span class="toggle-icon">➖</span>
-                                <ul class="nested">
-                                    <li onclick="toggle(event, this)"><input type="checkbox"> Patient Care [E02.760] <span class="toggle-icon">➖</span>
-                                        <ul class="nested">
-                                            <li onclick="toggle(event, this)"><input type="checkbox" checked> Palliative Care [E02.760.666] <span class="toggle-icon">➖</span></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <hr>
+                    <ul class="tree">
+                        <li onclick="toggle(event, this)">
+                            <input type="checkbox"> Diseases [C] <span class="toggle-icon">➖</span>
+                            <ul class="nested" style="display: block;">
+                                <li onclick="toggle(event, this)">
+                                    <input type="checkbox"> Neoplasms [C04] <span class="toggle-icon">➖</span>
+                                    <ul class="nested" style="display: block;">
+                                        <li onclick="toggle(event, this)">
+                                            <input type="checkbox"> Neoplasms by Site [C04.588] <span
+                                                class="toggle-icon">➖</span>
+                                            <ul class="nested" style="display: block;">
+                                                <li onclick="toggle(event, this)">
+                                                    <input type="checkbox" checked> Breast Neoplasms [C04.588.180]
+                                                    <span class="toggle-icon">➖</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <hr>
+                </div>
+            </div>
+            <div class="mesh-item" data-category="palliative-care">
+                <h4 class="card-title">Palliative Care</h4>
+                <div class="card-content">
+                    <ul class="tree">
+                        <li onclick="toggle(event, this)">
+                            <input type="checkbox"> Health Care [N] <span class="toggle-icon">➖</span>
+                            <ul class="nested" style="display: block;">
+                                <li onclick="toggle(event, this)">
+                                    <input type="checkbox"> Health Care Facilities, Manpower, and Services [N02]​ <span
+                                        class="toggle-icon">➖</span>
+                                    <ul class="nested" style="display: block;">
+                                        <li onclick="toggle(event, this)">
+                                            <input type="checkbox"> Health Services [N02.421] <span
+                                                class="toggle-icon">➖</span>
+                                            <ul class="nested" style="display: block;">
+                                                <li onclick="toggle(event, this)">
+                                                    <input type="checkbox"> Patient Care [N02.421.585] <span
+                                                        class="toggle-icon">➖</span>
+                                                    <ul class="nested" style="display: block;">
+                                                        <li onclick="toggle(event, this)">
+                                                            <input type="checkbox" checked> Palliative Care [N02.421.585.666]
+                                                            <span class="toggle-icon">➖</span>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <hr>
+                    <ul class="tree">
+                        <li onclick="toggle(event, this)">
+                            <input type="checkbox"> Analytical, Diagnostic and Therapeutic Techniques and Equipment [E]
+                            <span class="toggle-icon">➖</span>
+                            <ul class="nested" style="display: block;">
+                                <li onclick="toggle(event, this)">
+                                    <input type="checkbox"> Therapeutics [E02] <span class="toggle-icon">➖</span>
+                                    <ul class="nested" style="display: block;">
+                                        <li onclick="toggle(event, this)">
+                                            <input type="checkbox"> Patient Care [E02.760] <span
+                                                class="toggle-icon">➖</span>
+                                            <ul class="nested" style="display: block;">
+                                                <li onclick="toggle(event, this)">
+                                                    <input type="checkbox" checked> Palliative Care [E02.760.666] <span
+                                                        class="toggle-icon">➖</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <hr>
+                </div>
+            </div>
+            <div class="mesh-item" data-category="immune-system">
+                <h4 class="card-title">Immune System</h4>
+                <div class="card-content">
+                    <ul class="tree">
+                        <li onclick="toggle(event, this)">
+                            <input type="checkbox"> Immune System [A11.557] <span class="toggle-icon">➖</span>
+                        </li>
+                    </ul>
+                    <hr>
+                    <ul class="tree">
+                        <li onclick="toggle(event, this)">
+                            <input type="checkbox"> Immunity [G03.578] <span class="toggle-icon">➖</span>
+                            <ul class="nested" style="display: block;">
+                                <li onclick="toggle(event, this)">
+                                    <input type="checkbox"> Immunologic Processes [G03.578.500] <span
+                                        class="toggle-icon">➖</span>
+                                    <ul class="nested" style="display: block;">
+                                        <li onclick="toggle(event, this)">
+                                            <input type="checkbox" checked> Immune System [G03.578.500.500] <span
+                                                class="toggle-icon">➖</span>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <hr>
+                </div>
+            </div>
+            <div class="mesh-item" data-category="open-term">
+                <h4 class="card-title">Open Term</h4>
+                <div class="card-content">
+                    <ul class="tree">
+                        <li onclick="toggle(event, this)">
+                            <input type="checkbox" checked> Open Term Root <span class="toggle-icon">➖</span>
+                        </li>
+                    </ul>
+                    <hr>
+                </div>
             </div>
         </div>
     </div>
-
     <script>
-      function toggle(event, element) {
-    // Prevent toggling when clicking on a checkbox
-    if (event.target.tagName.toLowerCase() === "input" && event.target.type === "checkbox") {
-        return;
-    }
-    
-    event.stopPropagation();
-    let nestedList = element.querySelector(".nested");
-    let icon = element.querySelector(".toggle-icon");
-    
-    if (nestedList) {
-        let isVisible = nestedList.style.display !== "none";
-        nestedList.style.display = isVisible ? "none" : "block";
-        icon.textContent = isVisible ? "➕" : "➖";
-    }
-}
+        // Use a proxy to handle API requests
+        const API_BASE_URL = '/api'; //  Update this if needed
 
-document.getElementById("categorySearch").addEventListener("input", function () {
-    let searchResults = document.getElementById("searchResults");
-    searchResults.innerHTML = "";
-    let searchTerm = this.value.toLowerCase();
+        function toggle(event, element) {
+            // Prevent toggling when clicking on a checkbox
+            if (event.target.tagName.toLowerCase() === "input" && event.target.type === "checkbox") {
+                return;
+            }
 
-    let categories = [
-        { name: "Breast Cancer", id: "breast-cancer" },
-        { name: "Palliative Care", id: "palliative-care" }
-    ];
+            event.stopPropagation();
+            let nestedList = element.querySelector(".nested");
+            let icon = element.querySelector(".toggle-icon");
 
-    let filtered = categories.filter(cat => cat.name.toLowerCase().includes(searchTerm));
+            if (nestedList) {
+                let isVisible = nestedList.style.display !== "none";
+                nestedList.style.display = isVisible ? "none" : "block";
+                icon.textContent = isVisible ? "➕" : "➖";
+            }
+        }
 
-    if (searchTerm === "") {
-        document.querySelectorAll(".mesh-item").forEach(item => item.style.display = "none");
-        document.querySelectorAll(".mesh-tag").forEach(tag => tag.style.display = "none");
-        return;
-    }
-
-    filtered.forEach(cat => {
-        let result = document.createElement("div");
-        result.textContent = cat.name;
-        result.setAttribute("data-category", cat.id);
-        result.addEventListener("click", function () {
-            let category = this.getAttribute("data-category");
-            document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "block";
-            document.querySelector(`.mesh-tag[data-category='${category}']`).style.display = "inline-block";
+        document.getElementById("categorySearch").addEventListener("input", function () {
+            let searchResults = document.getElementById("searchResults");
             searchResults.innerHTML = "";
-            document.getElementById("categorySearch").value = "";
+            let searchTerm = this.value.toLowerCase();
+
+            if (searchTerm === "") {
+                document.querySelectorAll(".mesh-item").forEach(item => item.style.display = "none");
+                document.querySelectorAll(".mesh-tag").forEach(tag => tag.style.display = "none");
+                return;
+            }
+
+            // Show loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'loading';
+            loadingIndicator.textContent = 'Loading MeSH terms...';
+            document.body.appendChild(loadingIndicator);
+
+            // Fetch MeSH terms from the API
+            fetch(`${API_BASE_URL}/mesh?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Remove loading indicator
+                    document.body.removeChild(loadingIndicator);
+
+                    // Clear previous results
+                    searchResults.innerHTML = "";
+
+                    if (data && data.length > 0) {
+                        data.forEach(item => {
+                            let result = document.createElement("div");
+                            result.textContent = item.name + " (MeSH Term ID: " + item.id + ")";
+                            result.setAttribute("data-category", item.category);
+                            result.setAttribute("data-mesh-id", item.id); // Store MeSH ID
+                            result.addEventListener("click", function () {
+                                let category = this.getAttribute("data-category");
+                                let meshId = this.getAttribute("data-mesh-id"); // Get MeSH ID
+
+                                // Show the MeSH item
+                                showMeshItem(meshId);
+
+                                //create tag
+                                if (!document.querySelector(`.mesh-tag[data-category='${category}']`)) {
+                                    let newTag = document.createElement("div");
+                                    newTag.className = "mesh-tag";
+                                    newTag.setAttribute("data-category", category);
+                                    newTag.textContent = category;
+                                    newTag.innerHTML += ' <i class="fa-solid fa-xmark"></i>';
+                                    newTag.addEventListener("click", function () {
+                                        let cat = this.getAttribute("data-category");
+                                        document.querySelectorAll(`.mesh-item[data-category='${cat}']`).forEach(item => item.style.display = "none");
+                                        this.style.display = "none";
+                                    });
+                                    document.getElementById("categoryTags").appendChild(newTag);
+                                } else {
+                                    document.querySelector(`.mesh-tag[data-category='${category}']`).style.display =
+                                        "inline-block";
+                                }
+
+                                searchResults.innerHTML = "";
+                                document.getElementById("categorySearch").value = "";
+                            });
+                            searchResults.appendChild(result);
+                        });
+                    } else {
+                        searchResults.innerHTML = "No matching MeSH terms found.";
+                    }
+                })
+                .catch(error => {
+                    // Remove loading indicator
+                    document.body.removeChild(loadingIndicator);
+                    console.error("Error fetching MeSH terms:", error);
+                    // Display error message to the user
+                    const errorMessageDiv = document.createElement('div');
+                    errorMessageDiv.className = 'error-message';
+                    errorMessageDiv.textContent = 'Failed to load MeSH data. Please check your network connection and try again.';
+                    document.body.appendChild(errorMessageDiv);
+                    setTimeout(() => {
+                        document.body.removeChild(errorMessageDiv);
+                    }, 5000); // Remove the message after 5 seconds
+
+                });
         });
-        searchResults.appendChild(result);
-    });
-});
 
-document.querySelectorAll(".mesh-tag").forEach(tag => {
-    tag.addEventListener("click", function () {
-        let category = this.getAttribute("data-category");
-        document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "none";
-        this.style.display = "none";
-    });
-});
+        document.querySelectorAll(".mesh-tag").forEach(tag => {
+            tag.addEventListener("click", function () {
+                let category = this.getAttribute("data-category");
+                document.querySelectorAll(`.mesh-item[data-category='${category}']`).forEach(item => item.style.display = "none");
+                this.style.display = "none";
+            });
+        });
 
+        function showMeshItem(meshId) {
+            // Show loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'loading';
+            loadingIndicator.textContent = 'Loading MeSH term details...';
+            document.body.appendChild(loadingIndicator);
+
+            fetch(`${API_BASE_URL}/mesh/details?id=${encodeURIComponent(meshId)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Remove loading indicator
+                    document.body.removeChild(loadingIndicator);
+
+                    if (data) {
+                        //check if the item already exists, if so, remove it
+                        let existingItem = document.querySelector(`.mesh-item[data-mesh-id='${meshId}']`);
+                        if (existingItem) {
+                            existingItem.remove();
+                        }
+                        let meshItemDiv = document.createElement("div");
+                        meshItemDiv.className = "mesh-item";
+                        meshItemDiv.setAttribute("data-category", data.category);  //set the category
+                        meshItemDiv.setAttribute("data-mesh-id", meshId); // Store MeSH ID
+                        meshItemDiv.innerHTML = `
+                            <h4 class="card-title">${data.name}</h4>
+                            <div class="card-content">
+                                <ul class="tree">
+                                    ${generateTreeHTML(data.treeNumbers, data.id)}
+                                </ul>
+                                <hr>
+                                <p><strong>Definition:</strong> ${data.definition || 'Not available'}</p>
+                                <p><strong>Entry Terms:</strong> ${data.entryTerms ? data.entryTerms.join(', ') : 'None'}</p>
+                            </div>
+                        `;
+                        document.getElementById("items").appendChild(meshItemDiv);
+                        meshItemDiv.style.display = "block"; //make sure the item is displayed
+                        expandTree(meshId);
+
+                    } else {
+                        console.warn("MeSH term details not found for ID:", meshId);
+                    }
+                })
+                .catch(error => {
+                    // Remove loading indicator
+                    document.body.removeChild(loadingIndicator);
+                    console.error("Error fetching MeSH term details:", error);
+                    // Display error message
+                    const errorMessageDiv = document.createElement('div');
+                    errorMessageDiv.className = 'error-message';
+                    errorMessageDiv.textContent = 'Failed to load MeSH term details. Please check your network connection and try again.';
+                    document.body.appendChild(errorMessageDiv);
+                    setTimeout(() => {
+                        document.body.removeChild(errorMessageDiv);
+                    }, 5000); // Remove the message after 5 seconds
+                });
+        }
+
+        function generateTreeHTML(treeNumbers, selectedMeshId) {
+            let html = '';
+            if (!treeNumbers || treeNumbers.length === 0) {
+                return '<li data-mesh-id="' + selectedMeshId + '">No Tree Numbers</li>';
+            }
+            treeNumbers.forEach(treeNumber => {
+                let parts = treeNumber.split('.');
+                let currentPath = [];
+                parts.forEach((part, index) => {
+                    currentPath.push(part);
+                    let fullPath = currentPath.join('.');
+                    let displayName = fullPath; // Or fetch name if you have the data
+                    // Indentation is removed, and display is set to block.
+                    html += `<li data-tree-number="${fullPath}" data-mesh-id="${selectedMeshId}" style="display: block;">
+                            <input type="checkbox" ${index === parts.length - 1 ? 'checked' : ''}> ${displayName}
+                            <span class="toggle-icon">${index < parts.length - 1 ? '➖' : ''}</span>
+                            <ul class="nested" style="display: ${index < parts.length - 1 ? 'block' : 'none'};">`; //keep nested open
+                });
+                for (let i = 0; i < parts.length; i++) {
+                    html += `</ul></li>`;
+                }
+            });
+            return html;
+        }
+
+        function expandTree(meshId) {
+            fetch(`${API_BASE_URL}/mesh/tree?id=${encodeURIComponent(meshId)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.length > 0) {
+                        data.forEach(treeNumber => {
+                            let targetNode = document.querySelector(`[data-tree-number="${treeNumber}"]`);
+                            while (targetNode) {
+                                let parent = targetNode.parentElement;
+                                if (parent && parent.classList.contains('nested')) {
+                                    parent.style.display = 'block';
+                                    let toggleIcon = parent.previousElementSibling.querySelector('.toggle-icon');
+                                    if (toggleIcon) {
+                                        toggleIcon.textContent = '➖';
+                                    }
+                                    targetNode = parent.parentElement;
+                                } else {
+                                    targetNode = null;
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error expanding tree:", error);
+                    // Optionally display an error message to the user
+                    const errorMessageDiv = document.createElement('div');
+                    errorMessageDiv.className = 'error-message';
+                    errorMessageDiv.textContent = 'Failed to expand the MeSH tree. Please check your network connection and try again.';
+                    document.body.appendChild(errorMessageDiv);
+                    setTimeout(() => {
+                        document.body.removeChild(errorMessageDiv);
+                    }, 5000); // Remove the message after 5 seconds
+                });
+        }
     </script>
 </body>
+
 </html>
