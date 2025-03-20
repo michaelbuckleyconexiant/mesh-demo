@@ -105,7 +105,7 @@
         <div id="searchResults" class="search-results"></div>
 
         <div id="categoryTags" class="category-tags">
-            <div class="mesh-tag" data-category="breast-cancer">Breast Cancer <i class="fa-solid fa-xmark"></i></div>
+            <div class="mesh-tag" data-category="breast-cancer">Breast Cancer (Breast Neoplasms) <i class="fa-solid fa-xmark"></i></div>
             <div class="mesh-tag" data-category="palliative-care">Palliative Care <i class="fa-solid fa-xmark"></i></div>
         </div>
 
@@ -114,11 +114,11 @@
                 <h4>Breast Cancer</h4>
                 <hr>
                 <ul class="tree">
-                    <li onclick="toggle(event, this)"><input type="checkbox"> Diseases [C] <span class="toggle-icon">➖</span>
+                    <li onclick="toggle(event, this)"> Diseases [C] <span class="toggle-icon">➖</span>
                         <ul class="nested">
-                            <li onclick="toggle(event, this)"><input type="checkbox"> Neoplasms [C04] <span class="toggle-icon">➖</span>
+                            <li onclick="toggle(event, this)"> Neoplasms [C04] <span class="toggle-icon">➖</span>
                                 <ul class="nested">
-                                    <li onclick="toggle(event, this)"><input type="checkbox"> Neoplasms by Site [C04.588] <span class="toggle-icon">➖</span>
+                                    <li onclick="toggle(event, this)"> Neoplasms by Site [C04.588] <span class="toggle-icon">➖</span>
                                         <ul class="nested">
                                             <li onclick="toggle(event, this)"><input type="checkbox" checked> Breast Neoplasms [C04.588.180] <span class="toggle-icon">➖</span></li>
                                         </ul>
@@ -128,19 +128,43 @@
                         </ul>
                     </li>
                 </ul>
+<hr>
+
+<ul class="tree">
+    <li onclick="toggle(event, this)"> Diseases [C] <span class="toggle-icon">➖</span>
+        <ul class="nested">
+            <li onclick="toggle(event, this)"> Skin and Connective Tissue Diseases [C17] <span class="toggle-icon">➖</span>
+                <ul class="nested">
+                    <li onclick="toggle(event, this)"> Skin Diseases [C17.800] <span class="toggle-icon">➖</span>
+                        <ul class="nested">
+                            <li onclick="toggle(event, this)"> Breast Diseases [C17.800.090] <span class="toggle-icon">➖</span></li>
+
+                                    <ul class="nested">
+                                        <li onclick="toggle(event, this)"><input type="checkbox" checked> Breast Neoplasms [C17.800.090.500]  <span class="toggle-icon">➖</span></li>
+                                    </ul>
+
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+
             </div>
 
             <div class="mesh-item" data-category="palliative-care">
                 <h4>Palliative Care</h4>
                 <hr>
                 <ul class="tree">
-                    <li onclick="toggle(event, this)"><input type="checkbox"> Health Care [N] <span class="toggle-icon">➖</span>
+                    <li onclick="toggle(event, this)"> Health Care [N] <span class="toggle-icon">➖</span>
                         <ul class="nested">
-                            <li onclick="toggle(event, this)"><input type="checkbox"> Health Care Facilities, Manpower, and Services [N02]​ <span class="toggle-icon">➖</span>
+                            <li onclick="toggle(event, this)"> Health Care Facilities, Manpower, and Services [N02]​ <span class="toggle-icon">➖</span>
                                 <ul class="nested">
-                                    <li onclick="toggle(event, this)"><input type="checkbox"> Health Services [N02.421] <span class="toggle-icon">➖</span>
+                                    <li onclick="toggle(event, this)"> Health Services [N02.421] <span class="toggle-icon">➖</span>
                                         <ul class="nested">
-                                            <li onclick="toggle(event, this)"><input type="checkbox"> Patient Care [N02.421.585] <span class="toggle-icon">➖</span></li>
+                                            <li onclick="toggle(event, this)"> Patient Care [N02.421.585] <span class="toggle-icon">➖</span></li>
 
                                             <ul class="nested">
                                                 <li onclick="toggle(event, this)"><input type="checkbox" checked> Palliative Care [N02.421.585.666] <span class="toggle-icon">➖</span></li>
@@ -155,11 +179,11 @@
                 <hr>
 
                 <ul class="tree">
-                    <li onclick="toggle(event, this)"><input type="checkbox"> Analytical, Diagnostic and Therapeutic Techniques and Equipment [E] <span class="toggle-icon">➖</span>
+                    <li onclick="toggle(event, this)"> Analytical, Diagnostic and Therapeutic Techniques and Equipment [E] <span class="toggle-icon">➖</span>
                         <ul class="nested">
-                            <li onclick="toggle(event, this)"><input type="checkbox"> Therapeutics [E02] <span class="toggle-icon">➖</span>
+                            <li onclick="toggle(event, this)"> Therapeutics [E02] <span class="toggle-icon">➖</span>
                                 <ul class="nested">
-                                    <li onclick="toggle(event, this)"><input type="checkbox"> Patient Care [E02.760] <span class="toggle-icon">➖</span>
+                                    <li onclick="toggle(event, this)"> Patient Care [E02.760] <span class="toggle-icon">➖</span>
                                         <ul class="nested">
                                             <li onclick="toggle(event, this)"><input type="checkbox" checked> Palliative Care [E02.760.666] <span class="toggle-icon">➖</span></li>
                                         </ul>
@@ -174,30 +198,43 @@
     </div>
 
     <script>
-      function toggle(event, element) {
-    // Prevent toggling when clicking on a checkbox
-    if (event.target.tagName.toLowerCase() === "input" && event.target.type === "checkbox") {
-        return;
-    }
-    
-    event.stopPropagation();
-    let nestedList = element.querySelector(".nested");
-    let icon = element.querySelector(".toggle-icon");
-    
-    if (nestedList) {
-        let isVisible = nestedList.style.display !== "none";
-        nestedList.style.display = isVisible ? "none" : "block";
-        icon.textContent = isVisible ? "➕" : "➖";
-    }
-}
 
-document.getElementById("categorySearch").addEventListener("input", function () {
-    let searchResults = document.getElementById("searchResults");
+let selectedIndex = -1; // Keeps track of the currently selected search result
+
+const categorySearch = document.getElementById("categorySearch");
+const searchResults = document.getElementById("searchResults");
+
+categorySearch.addEventListener("keydown", function (event) {
+    let results = searchResults.querySelectorAll("div");
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+        selectedIndex = (selectedIndex + 1) % results.length;
+        updateSelection(results);
+    } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        selectedIndex = (selectedIndex - 1 + results.length) % results.length;
+        updateSelection(results);
+    } else if (event.key === "Enter") {
+        event.preventDefault();
+        if (selectedIndex >= 0 && results[selectedIndex]) {
+            results[selectedIndex].click();
+        } else {
+            performSearch();
+        }
+    }
+});
+
+categorySearch.addEventListener("input", function () {
+    performSearch();
+});
+
+function performSearch() {
     searchResults.innerHTML = "";
-    let searchTerm = this.value.toLowerCase();
+    selectedIndex = -1; // Reset selection
+    let searchTerm = categorySearch.value.toLowerCase();
 
     let categories = [
-        { name: "Breast Cancer", id: "breast-cancer" },
+        { name: "Breast Cancer (Breast Neoplasms)", id: "breast-cancer" },
         { name: "Palliative Care", id: "palliative-care" }
     ];
 
@@ -209,20 +246,29 @@ document.getElementById("categorySearch").addEventListener("input", function () 
         return;
     }
 
-    filtered.forEach(cat => {
+    filtered.forEach((cat, index) => {
         let result = document.createElement("div");
         result.textContent = cat.name;
         result.setAttribute("data-category", cat.id);
         result.addEventListener("click", function () {
-            let category = this.getAttribute("data-category");
-            document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "block";
-            document.querySelector(`.mesh-tag[data-category='${category}']`).style.display = "inline-block";
-            searchResults.innerHTML = "";
-            document.getElementById("categorySearch").value = "";
+            showCategory(cat.id);
         });
         searchResults.appendChild(result);
     });
-});
+}
+
+function updateSelection(results) {
+    results.forEach((result, index) => {
+        result.style.backgroundColor = index === selectedIndex ? "#ddd" : "#efefef";
+    });
+}
+
+function showCategory(category) {
+    document.querySelector(`.mesh-item[data-category='${category}']`).style.display = "block";
+    document.querySelector(`.mesh-tag[data-category='${category}']`).style.display = "inline-block";
+    searchResults.innerHTML = "";
+    categorySearch.value = "";
+}
 
 document.querySelectorAll(".mesh-tag").forEach(tag => {
     tag.addEventListener("click", function () {
@@ -231,6 +277,8 @@ document.querySelectorAll(".mesh-tag").forEach(tag => {
         this.style.display = "none";
     });
 });
+
+
 
     </script>
 </body>
