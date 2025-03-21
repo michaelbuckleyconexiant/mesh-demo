@@ -1,1347 +1,1294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collapsible Tier Structure</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Collapsible Tier Structure</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+    }
 
-        ul {
-            list-style-type: none;
-            padding-left: 20px;
-        }
-        li {
-            margin-bottom: 5px;
-        }
+    ul {
+      list-style-type: none;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 5px;
+    }
 
-        .collapsible {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            font-size: 18px;
-        }
+    .collapsible {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+    }
 
-        .toggle-icon {
-            width: 15px;
-            height: 15px;
-            display: inline-block;
-            margin-right: 8px;
-            text-align: center;
-            font-weight: bold;
-            background: #007bff;
-            color: white;
-            border-radius: 50%;
-            line-height: 15px;
-            font-size: 12px;
-        }
+    .toggle-icon {
+      width: 15px;
+      height: 15px;
+      display: inline-block;
+      margin-right: 8px;
+      text-align: center;
+      font-weight: bold;
+      background: #007bff;
+      color: white;
+      border-radius: 50%;
+      line-height: 15px;
+      font-size: 12px;
+    }
 
-        .checkbox {
-            margin-left: 8px;
-            margin-right: 8px;
-        }
+    .checkbox {
+      margin-left: 8px;
+      margin-right: 8px;
+    }
 
-        .nested {
-            display: none;
-            padding-left: 20px;
-        }
+    .nested {
+      display: none;
+      padding-left: 20px;
+    }
+    .nested .nested {
+      padding-left: 40px;
+    }
+    .active > .nested {
+      display: block;
+    }
 
-        .nested .nested {
-            padding-left: 40px;
-        }
+    #selected-items {
+      margin-bottom: 20px;
+    }
 
-        .active > .nested {
-            display: block;
-        }
+    .tag {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 5px;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-        #selected-items {
-            margin-bottom: 20px;
-        }
+    .tag .remove {
+      margin-left: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-        .tag {
-            display: inline-block;
-            padding: 5px 10px;
-            margin: 5px;
-            background: #007bff;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    #search-bar {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 16px;
+      display: block;
+    }
 
-        .tag .remove {
-            margin-left: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    #suggestions {
+      border: 1px solid #ccc;
+      max-height: 150px;
+      overflow-y: auto;
+      display: none;
+      background: white;
+      position: absolute;
+      width: 100%;
+      z-index: 999;
+    }
 
-        #search-bar {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-            display: block;
-        }
+    .suggestion {
+      padding: 8px;
+      cursor: pointer;
+    }
+    .suggestion:hover,
+    .suggestion.active {
+      background: #ddd;
+    }
 
-        #suggestions {
-            border: 1px solid #ccc;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-            background: white;
-            position: absolute;
-            width: 100%;
-            z-index: 999;
-        }
+    .collapsible-container {
+      width: 100%;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
+      height: 100%;
+    }
 
-        .suggestion {
-            padding: 8px;
-            cursor: pointer;
-        }
+    .collapsible-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #007bff;
+      color: white;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
 
-        .suggestion:hover, .suggestion.active {
-            background: #ddd;
-        }
+    .chevron {
+      transition: transform 0.3s ease;
+      display: inline-block;
+      font-size: 20px;
+      transform: rotate(0deg); /* Initial rotation set to 0 degrees */
+    }
 
-        .collapsible-container {
-            width: 100%;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin: 0 auto;
-            height: 100%;
-        }
+    .content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+      background: white;
+      padding: 0 16px;
+      height: 400px;
+      overflow-y: scroll;
+    }
 
-        .collapsible-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #007bff;
-            color: white;
-            padding: 12px 16px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
-        .chevron {
-            transition: transform 0.3s ease;
-            display: inline-block;
-            font-size: 20px;
-            transform: rotate(0deg); /* Initial rotation set to 0 degrees */
-        }
+    .content th,
+    .content td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
 
-        .content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-            background: white;
-            padding: 0 16px;
-            height: 400px;
-            overflow-y: scroll;
-        }
+    .expanded {
+      max-height: 100%;
+      padding: 12px 16px;
+    }
 
-        .content table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    .rotate {
+      transform: rotate(90deg); /* Rotate 90 degrees for down state */
+    }
 
-        .content th, .content td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
+    .main-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 50px 30px;
+      position: relative;
+    }
 
-        .expanded {
-            max-height: 100%;
-            padding: 12px 16px;
-        }
+    .search-wrapper {
+      position: relative;
+    }
 
-        .rotate {
-            transform: rotate(90deg); /* Rotate 90 degrees for down state */
-        }
+    /*
+      Only highlight the direct line (the .collapsible span) when checked.
+      This ensures the children won't inherit the background color.
+    */
+    li.checked {
+      /* remove the default li highlight if you prefer. */
+      /* background-color: #d0ebff; */
+    }
 
-        .main-wrapper {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 50px 30px;
-            position: relative;
-        }
+    li.checked > .collapsible {
+      background-color: #d0ebff; /* highlight only the parent row */
+      border-radius: 6px;
+      padding: 4px;
+    }
+    .mesh-small-text {
+      font-size: .8rem;
+      line-height: 1.2;
+      margin-bottom: 15px;
+      margin-top: 15px;
+    }
 
-        .search-wrapper {
-            position: relative;
-        }
-    </style>
+  </style>
 </head>
 <body>
-    <div class="main-wrapper">
-        <h2 style="margin-bottom: 15px; display: block;">Categories</h2>
-        <input type="text" id="search-bar" placeholder="Search..." onkeydown="handleSearchAndNavigation(event)">
-        <div class="search-wrapper"><div id="suggestions"></div></div>
-        <div id="selected-items"></div>
-        <div class="collapsible-container">
-            <div class="collapsible-header" onclick="toggleCollapse()">
-                <span>Select / View Categories</span>
-                <span class="chevron"><i class="fa-solid fa-chevron-left"></i></span>
-            </div>
-            <div class="content">
-                <ul id="items-list">
-                    <script>
-                        function generateMeshList() {
-                            const categories = [
-                                {
-                                    name: "Anatomy",
-                                    children: [
-                                        {
-                                            name: "Body Regions",
-                                            children: [
-                                                { name: "Head" },
-                                                { name: "Neck" },
-                                                { name: "Thorax" },
-                                                { name: "Abdomen" },
-                                                { name: "Pelvis" },
-                                                { name: "Extremities" },
-                                            ],
-                                        },
-                                        {
-                                            name: "Cells",
-                                            children: [
-                                                { name: "Blood Cells" },
-                                                { name: "Nerve Cells" },
-                                                { name: "Skin Cells" },
-                                                { name: "Muscle Cells" },
-                                            ],
-                                        },
-                                        {
-                                            name: "Tissues",
-                                            children: [
-                                                 {name: "Epithelial Tissue"},
-                                                 {name: "Connective Tissue"},
-                                                 {name: "Muscle Tissue"},
-                                                 {name: "Nervous Tissue"}
-                                            ]
-                                        }
-                                    ],
-                                },
-                                {
-                                    name: "Organisms",
-                                    children: [
-                                        {
-                                            name: "Bacteria",
-                                            children: [
-                                                { name: "Gram-Positive Bacteria" },
-                                                { name: "Gram-Negative Bacteria" },
-                                                {name: "Cocci"},
-                                                {name: "Bacilli"}
-                                            ],
-                                        },
-                                        {
-                                            name: "Viruses",
-                                            children: [
-                                                { name: "DNA Viruses" },
-                                                { name: "RNA Viruses" },
-                                                {name: "Retroviruses"},
-                                                {name: "Coronaviridae"}
-                                            ],
-                                        },
-                                        {
-                                          name: "Fungi",
-                                          children: [
-                                            {name: "Yeasts"},
-                                            {name: "Molds"}
-                                          ]
-                                        },
-                                        {
-                                            name: "Animals",
-                                            children: [
-                                                { name: "Mammals",
-                                                  children: [
-                                                    {name: "Primates"},
-                                                    {name: "Rodents"},
-                                                    {name: "Carnivora"}
-                                                  ]
-                                                },
-                                                { name: "Reptiles" },
-                                                { name: "Birds" },
-                                                { name: "Fish" },
-                                            ],
-                                        },
-                                         {
-                                            name: "Plants",
-                                            children:[
-                                                {name:"Angiosperms"},
-                                                {name:"Gymnosperms"}
-                                            ]
-                                        }
-                                    ],
-                                },
-                                {
-                                    name: "Diseases",
-                                    children: [
-                                        {
-                                            name: "Infectious Diseases",
-                                            children: [
-                                                { name: "Bacterial Infections",
-                                                  children: [
-                                                    {name: "Pneumonia (Lung infection)"},
-                                                    {name: "Tuberculosis (TB)"},
-                                                    {name: "Meningitis (Brain infection)"}
-                                                  ]
-                                                },
-                                                { name: "Viral Infections",
-                                                  children:[
-                                                    {name: "Influenza (Flu)"},
-                                                    {name: "HIV Infection (AIDS)"},
-                                                    {name: "Hepatitis (Liver inflammation)"}
-                                                  ]
-                                                },
-                                                {name: "Fungal Infections"},
-                                                {name: "Parasitic Diseases"}
-                                            ],
-                                        },
-                                        {
-                                            name: "Neoplasms (Tumors)",
-                                            children: [
-                                                { name: "Carcinoma (Cancer of epithelial tissue)" },
-                                                { name: "Sarcoma (Cancer of connective tissue)" },
-                                                { name: "Lymphoma (Cancer of the lymphatic system)" },
-                                                {name: "Leukemia (Cancer of blood-forming tissue)"}
-                                            ],
-                                        },
-                                        {
-                                            name: "Cardiovascular Diseases (Heart and blood vessel diseases)",
-                                            children: [
-                                                { name: "Hypertension (High blood pressure)" },
-                                                { name: "Coronary Artery Disease (Heart disease)" },
-                                                {name: "Heart Failure"},
-                                                {name: "Stroke (Brain attack)"}
-                                            ],
-                                        },
-                                        {
-                                            name: "Endocrine Diseases (Hormone disorders)",
-                                            children: [
-                                                {name: "Diabetes Mellitus (High blood sugar)"},
-                                                {name: "Hypothyroidism (Underactive thyroid)"},
-                                                {name: "Hyperthyroidism (Overactive thyroid)"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Nervous System Diseases",
-                                            children: [
-                                                {name:"Alzheimer's Disease (Memory loss)"},
-                                                {name: "Parkinson's Disease (Movement disorder)"},
-                                                {name: "Epilepsy (Seizures)"},
-                                                {name: "Multiple Sclerosis (Nerve damage)"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Mental Disorders",
-                                            children: [
-                                                {name:"Depression (Mood disorder)"},
-                                                {name:"Anxiety Disorders"},
-                                                {name:"Schizophrenia"},
-                                                {name:"Bipolar Disorder (Manic depression)"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Immune System Diseases",
-                                            children: [
-                                                {name: "Autoimmune Diseases",
-                                                  children: [
-                                                    {name: "Rheumatoid Arthritis (Joint inflammation)"},
-                                                    {name: "Lupus (Connective tissue disease)"}
-                                                  ]
-                                                },
-                                                {name: "Immunodeficiency Disorders (Weak immune system)"},
-                                                {name: "Allergies"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Digestive System Diseases",
-                                            children: [
-                                                {name: "Gastroenteritis (Stomach flu)"},
-                                                {name: "Peptic Ulcer (Stomach/intestinal ulcer)"},
-                                                {name: "Irritable Bowel Syndrome (IBS)"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Respiratory Tract Diseases (Lung diseases)",
-                                            children: [
-                                                {name: "Asthma"},
-                                                {name: "Chronic Obstructive Pulmonary Disease (COPD)"},
-                                                {name: "Pneumonia (Lung infection)"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Skin Diseases",
-                                            children: [
-                                                {name: "Eczema (Skin inflammation)"},
-                                                {name: "Psoriasis (Skin scaling)"},
-                                                {name: "Acne"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Musculoskeletal Diseases",
-                                            children:[
-                                                {name:"Arthritis (Joint inflammation)"},
-                                                {name:"Osteoporosis (Weak bones)"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Urogenital Diseases",
-                                            children: [
-                                                {name:"Kidney Diseases"},
-                                                {name:"Urinary Tract Infections (UTIs)"},
-                                                {name:"Sexually Transmitted Diseases (STDs)"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Congenital Disorders (Birth defects)",
-                                            children: [
-                                                {name:"Down Syndrome"},
-                                                {name:"Cystic Fibrosis"},
-                                                {name: "Spina Bifida"}
-                                            ]
-                                        },
-                                        {
-                                            name: "Nutritional and Metabolic Diseases",
-                                            children: [
-                                              {name: "Obesity"},
-                                              {name: "Malnutrition"},
-                                              {name: "Diabetes Mellitus"}
-                                            ]
-                                        }
-                                    ],
-                                },
-                                {
-                                  name: "Chemicals and Drugs",
-                                  children: [
-                                    {
-                                      name: "Inorganic Chemicals",
-                                      children: [
-                                        {name: "Acids"},
-                                        {name: "Bases"},
-                                        {name: "Salts"},
-                                        {name: "Metals"},
-                                        {name: "Non-Metals"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Organic Chemicals",
-                                      children: [
-                                        {name: "Hydrocarbons"},
-                                        {name: "Alcohols"},
-                                        {name: "Aldehydes"},
-                                         {name:"Ketones"},
-                                        {name: "Carboxylic Acids"},
-                                        {name: "Amines"},
-                                        {name: "Amides"},
-                                        {name: "Esters"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Pharmaceutical Preparations (Medications)",
-                                      children: [
-                                        {name: "Analgesics (Pain relievers)"},
-                                        {name: "Anesthetics (Numbing agents)"},
-                                        {name: "Anti-Inflammatory Agents"},
-                                        {name: "Antibiotics"},
-                                        {name: "Antiviral Agents"},
-                                        {name: "Antineoplastic Agents (Chemotherapy)"},
-                                        {name: "Cardiovascular Agents (Heart medications)"},
-                                        {name: "Central Nervous System Agents"},
-                                        {name: "Hormones"},
-                                        {name: "Vitamins"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Drugs",
-                                      children: [
-                                        {name: "Street Drugs"},
-                                        {name: "Prescription Drugs"},
-                                        {name: "Over-the-Counter Drugs"}
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                    name: "Health Care",
-                                    children: [
-                                      {
-                                        name: "Preventive Medicine",
-                                        children: [
-                                          {name: "Vaccination (Immunization)"},
-                                          {name: "Screening (Medical tests)"},
-                                          {name: "Health Promotion"}
-                                        ]
-                                      },
-                                      {
-                                        name: "Diagnosis",
-                                        children: [
-                                          {name: "Laboratory Tests (Blood tests, etc.)"},
-                                          {name: "Diagnostic Imaging (X-rays, etc.)"},
-                                          {name: "Physical Examination"}
-                                        ]
-                                      },
-                                      {
-                                        name: "Therapy (Treatment)",
-                                        children: [
-                                          {name: "Drug Therapy (Medication)"},
-                                          {name: "Surgery"},
-                                          {name: "Radiation Therapy (Cancer treatment)"},
-                                          {name: "Physical Therapy"},
-                                          {name: "Psychotherapy (Mental health therapy)"}
-                                        ]
-                                      },
-                                      {
-                                        name: "Rehabilitation",
-                                        children:[
-                                            {name: "Occupational Therapy"},
-                                            {name: "Speech Therapy"}
-                                        ]
-                                      },
-                                      {
-                                        name: "Hospitals",
-                                        children: [
-                                          {name: "General Hospitals"},
-                                          {name: "Specialized Hospitals"},
-                                          {name: "Teaching Hospitals"}
-                                        ]
-                                      },
-                                      {
-                                        name: "Medical Specialties",
-                                        children: [
-                                          {name: "Cardiology (Heart)"},
-                                          {name: "Dermatology (Skin)"},
-                                          {name: "Gastroenterology (Digestive system)"},
-                                          {name: "Neurology (Nerves)"},
-                                          {name: "Oncology (Cancer)"},
-                                          {name: "Pediatrics (Children)"},
-                                          {name: "Psychiatry (Mental health)"},
-                                          {name: "Surgery"},
-                                          {name: "Urology (Urinary system)"}
-                                        ]
-                                      }
-                                    ]
-                                },
-                                {
-                                  name: "Research",
-                                  children: [
-                                    {
-                                      name: "Biomedical Research",
-                                      children: [
-                                        {name: "Basic Research"},
-                                        {name: "Clinical Research"},
-                                        {name: "Translational Research"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Epidemiology (Study of diseases)",
-                                      children: [
-                                        {name: "Descriptive Epidemiology"},
-                                        {name: "Analytic Epidemiology"},
-                                        {name: "Experimental Epidemiology"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Genetics Research (Heredity study)",
-                                      children: [
-                                        {name: "Molecular Genetics"},
-                                        {name: "Population Genetics"},
-                                        {name: "Medical Genetics"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Drug Discovery (Medicine development)",
-                                      children: [
-                                        {name: "Target Identification"},
-                                        {name: "Lead Optimization"},
-                                        {name: "Clinical Trials"}
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  name: "Disciplines",
-                                  children: [
-                                    {
-                                      name: "Medicine",
-                                      children: [
-                                        {name: "Internal Medicine"},
-                                        {name: "Family Medicine"},
-                                        {name: "Emergency Medicine"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Dentistry (Oral care)",
-                                      children: [
-                                        {name: "Orthodontics (Braces)"},
-                                        {name: "Periodontics (Gum care)"},
-                                        {name: "Endodontics (Root canals)"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Nursing",
-                                      children: [
-                                        {name: "Critical Care Nursing"},
-                                        {name: "Pediatric Nursing"},
-                                        {name: "Geriatric Nursing"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Pharmacy (Medication services)",
-                                      children: [
-                                        {name: "Community Pharmacy"},
-                                        {name: "Hospital Pharmacy"},
-                                        {name: "Clinical Pharmacy"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Public Health",
-                                      children: [
-                                        {name: "Epidemiology"},
-                                        {name: "Biostatistics"},
-                                        {name: "Health Policy"}
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  name: "Devices",
-                                  children: [
-                                    {
-                                      name: "Therapeutic Devices",
-                                      children: [
-                                        {name: "Implants"},
-                                        {name: "Prostheses (Artificial limbs)"},
-                                        {name: "Assistive Devices"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Diagnostic Devices",
-                                      children: [
-                                        {name: "Imaging Equipment (Scanners)"},
-                                        {name: "Laboratory Equipment"},
-                                        {name: "Monitoring Devices"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Surgical Instruments",
-                                      children: [
-                                        {name: "Cutting Instruments"},
-                                        {name: "Grasping Instruments"},
-                                        {name: "Retractors"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Dental Equipment",
-                                      children: [
-                                        {name: "Dental Drills"},
-                                        {name: "Dental Lasers"},
-                                        {name: "Dental Chairs"}
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  name: "Phenomena",
-                                  children: [
-                                    {
-                                      name: "Biological Phenomena",
-                                      children: [
-                                        {name: "Aging"},
-                                        {name: "Apoptosis (Cell death)"},
-                                        {name: "Inflammation"},
-                                        {name: "Immunity"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Physical Phenomena",
-                                      children: [
-                                        {name: "Gravity"},
-                                        {name: "Pressure"},
-                                        {name: "Temperature"},
-                                        {name: "Radiation"}
-                                      ]
-                                    },
-                                     {
-                                      name: "Chemical Phenomena",
-                                      children: [
-                                        {name: "Catalysis"},
-                                        {name: "Chemical Reactions"},
-                                        {name: "Diffusion"}
-                                      ]
-                                    },
-                                    {
-                                      name: "Mental Processes",
-                                      children: [
-                                        {name: "Cognition (Thinking)"},
-                                        {name: "Emotion (Feelings)"},
-                                        {name: "Motivation"},
-                                        {name: "Perception (Senses)"}
-                                      ]
-                                    }
-                                  ]
-                                },
-                                 {
-                                  name: "Publications",
-                                  children: [
-                                    {name: "Journal Articles"},
-                                    {name: "Books"},
-                                    {name: "Review Articles"},
-                                    {name: "Clinical Trials"}
-                                  ]
-                                },
-                                {
-                                  name: "Named Groups",
-                                  children: [
-                                    {name: "Ethnic Groups"},
-                                    {name: "Occupational Groups"},
-                                    {name: "Religious Groups"},
-                                    {name: "Age Groups"}
-                                  ]
-                                },
-                                {
-                                  name: "Organizations",
-                                  children: [
-                                    {name: "Government Agencies"},
-                                    {name: "Non-profit Organizations"},
-                                    {name: "Professional Organizations"},
-                                    {name: "International Organizations"}
-                                  ]
-                                },
-                                {
-                                  name: "Health Occupations",
-                                  children: [
-                                    {name: "Physicians (Doctors)"},
-                                    {name: "Nurses"},
-                                    {name: "Dentists"},
-                                    {name: "Pharmacists (Drug specialists)"},
-                                    {name: "Allied Health Personnel"}
-                                  ]
-                                },
-                                {
-                                  name: "Anatomical Terms",
-                                  children: [
-                                    {name: "Anatomical Planes"},
-                                    {name: "Anatomical Regions"},
-                                    {name: "Directional Terms"},
-                                    {name: "Movements"}
-                                  ]
-                                },
-                                {
-                                  name: "Enzymes",
-                                  children: [
-                                    {name: "Oxidoreductases"},
-                                    {name: "Transferases"},
-                                    {name: "Hydrolases"},
-                                    {name: "Lyases"},
-                                    {name: "Isomerases"},
-                                    {name: "Ligases"}
-                                  ]
-                                },
-                                {
-                                  name: "Hormones",
-                                  children: [
-                                    {name: "Peptide Hormones"},
-                                    {name: "Steroid Hormones"},
-                                    {name: "Amino Acid Derivatives"}
-                                  ]
-                                },
-                                {
-                                  name: "Immunologic Factors",
-                                  children: [
-                                    {name: "Antibodies"},
-                                    {name: "Antigens"},
-                                    {name: "Cytokines"},
-                                    {name: "Complement System"}
-                                  ]
-                                },
-                                {
-                                  name: "Neoplasms by Site (Cancers by location)",
-                                  children: [
-                                    {name: "Head and Neck Neoplasms (Head and neck cancers)"},
-                                    {name: "Respiratory Tract Neoplasms (Lung cancers)"},
-                                    {name: "Digestive System Neoplasms (Stomach, colon cancers)"},
-                                    {name: "Urogenital Neoplasms (Bladder, prostate cancers)"},
-                                    {name: "Skin Neoplasms (Skin cancers)"},
-                                    {name: "Breast Neoplasms (Breast cancer)"},
-                                    {name: "Endocrine Neoplasms (Gland cancers)"},
-                                    {name: "Nervous System Neoplasms (Brain cancers)"},
-                                    {name: "Musculoskeletal Neoplasms (Bone, muscle cancers)"},
-                                    {name: "Hematologic Neoplasms (Blood cancers)"}
-                                  ]
-                                },
-                                {
-                                  name: "Wounds and Injuries",
-                                  children: [
-                                    {name: "Fractures (Broken bones)"},
-                                    {name: "Burns"},
-                                    {name: "Lacerations (Cuts)"},
-                                    {name: "Contusions (Bruises)"},
-                                    {name: "Sprains and Strains"}
-                                  ]
-                                },
-                                {
-                                  name: "Substances",
-                                  children: [
-                                    {name: "Elements"},
-                                    {name: "Chemical Compounds"},
-                                    {name: "Mixtures"},
-                                    {name: "Solutions"}
-                                  ]
-                                },
-                                {
-                                  name: "Geographic Locations",
-                                  children: [
-                                    {name: "Continents"},
-                                    {name: "Countries"},
-                                    {name: "Regions"},
-                                    {name: "Cities"}
-                                  ]
-                                },
-                                {
-                                  name: "Time",
-                                  children: [
-                                    {name: "Years"},
-                                    {name: "Months"},
-                                    {name: "Days"},
-                                     {name: "Hours"},
-                                    {name: "Minutes"},
-                                    {name: "Seconds"}
-                                  ]
-                                },
-                                {
-                                  name: "Information Science",
-                                  children: [
-                                    {name: "Information Storage and Retrieval"},
-                                    {name: "Library Science"},
-                                    {name: "Medical Informatics"},
-                                    {name: "Bioinformatics"}
-                                  ]
-                                },
-                                {
-                                  name: "Named Groups",
-                                  children: [
-                                    {name: "Patient Population"},
-                                    {name: "Healthcare Personnel (Medical staff)"},
-                                    {name: "Research Personnel (Scientists)"},
-                                    {name: "General Population (Public)"}
-                                  ]
-                                },
-                                {
-                                  name: "Industries",
-                                  children: [
-                                    {name: "Pharmaceutical Industry (Drug companies)"},
-                                    {name: "Biotechnology Industry"},
-                                    {name: "Healthcare Industry (Hospitals, clinics)"},
-                                    {name: "Medical Device Industry"}
-                                  ]
-                                },
-                                {
-                                  name: "Occupations",
-                                  children: [
-                                    {name: "Physicians (Doctors)"},
-                                    {name: "Nurses"},
-                                    {name: "Dentists"},
-                                    {name: "Pharmacists (Drug specialists)"},
-                                    {name: "Scientists"},
-                                    {name: "Researchers"}
-                                  ]
-                                },
-                                {
-                                  name: "Organizations",
-                                  children: [
-                                    {name: "Hospitals"},
-                                    {name: "Universities"},
-                                    {name: "Research Institutes"},
-                                    {name: "Government Agencies"},
-                                    {name: "Professional Societies"}
-                                  ]
-                                },
-                                {
-                                  name: "Social Sciences",
-                                  children: [
-                                    {name: "Sociology"},
-                                    {name: "Psychology"},
-                                    {name: "Economics"},
-                                    {name: "Anthropology"}
-                                  ]
-                                },
-                                {
-                                  name: "Technology",
-                                  children: [
-                                    {name: "Biotechnology"},
-                                    {name: "Medical Technology"},
-                                    {name: "Information Technology"},
-                                    {name: "Nanotechnology"}
-                                  ]
-                                },
-                                {
-                                  name: "Legislation",
-                                  children: [
-                                    {name: "Health Legislation (Laws about health)"},
-                                    {name: "Drug Legislation (Laws about medicines)"},
-                                    {name: "Environmental Legislation (Laws about the environment)"}
-                                  ]
-                                },
-                                {
-                                  name: "Ethics",
-                                  children: [
-                                    {name: "Medical Ethics"},
-                                    {name: "Research Ethics"},
-                                    {name: "Bioethics"}
-                                  ]
-                                },
-                                {
-                                  name: "Religion",
-                                  children: [
-                                    {name: "Christianity"},
-                                    {name: "Islam"},
-                                    {name: "Judaism"},
-                                    {name: "Hinduism"},
-                                    {name: "Buddhism"}
-                                  ]
-                                },
-                                {
-                                  name: "Philosophy",
-                                  children: [
-                                    {name: "Medical Philosophy"},
-                                    {name: "Philosophy of Science"}
-                                  ]
-                                },
-                                {
-                                  name: "Education",
-                                  children: [
-                                    {name: "Medical Education (Training for doctors)"},
-                                    {name: "Nursing Education (Training for nurses)"},
-                                    {name: "Dental Education (Training for dentists)"},
-                                    {name: "Pharmacy Education (Training for pharmacists)"}
-                                  ]
-                                },
-                                {
-                                  name: "Economics",
-                                  children: [
-                                    {name: "Health Economics"},
-                                    {name: "Pharmacoeconomics"}
-                                  ]
-                                },
-                                {
-                                  name: "Politics",
-                                  children: [
-                                    {name: "Health Policy (Government health plans)"},
-                                    {name: "Drug Policy (Government rules on medicines)"}
-                                  ]
-                                },
-                                {
-                                  name: "History",
-                                  children: [
-                                    {name: "History of Medicine"},
-                                    {name: "History of Science"}
-                                  ]
-                                },
-                                {
-                                  name: "Statistics",
-                                  children: [
-                                    {name: "Biostatistics (Statistics in biology)"},
-                                    {name: "Medical Statistics (Statistics in medicine)"}
-                                  ]
-                                },
-                                {
-                                    name: "Behavior and Behavior Mechanisms",
-                                    children: [
-                                      {name: "Behavior, Animal"},
-                                      {name: "Behavior, Social"},
-                                      {name: "Feeding Behavior"},
-                                      {name: "Sexual Behavior"}
-                                    ]
-                                },
-                                {
-                                  name: "Named Concepts",
-                                  children: [
-                                    {name: "Health"},
-                                    {name: "Disease"},
-                                    {name: "Illness"},
-                                    {name: "Pain"},
-                                    {name: "Quality of Life"}
-                                  ]
-                                }
-                            ];
+  <div class="main-wrapper">
+    <h2 style="margin-bottom: 15px; display: block;">Categories (MeSH)</h2>
+    <input
+      type="text"
+      id="search-bar"
+      placeholder="Search..."
+      onkeydown="handleSearchAndNavigation(event)"/>
 
-                            function createListHTML(arr, level = 0) {
-                                let html = '';
-                                const indent = '    '.repeat(level);
+      <p class="mesh-small-text">Click on active tags to navigate catagory tree.</p>
 
-                                arr.forEach((item, index) => {
-                                    const itemId = item.id || `${item.name.replace(/[^a-zA-Z0-9]/g, '')}-${level}-${index}`;
-                                    const displayName = item.displayName || item.name;
-                                    html += `${indent}<li>
-${indent}    <span class="collapsible" onclick="toggleSection(this, event)">
-${indent}        <span class="toggle-icon">+</span>
-${indent}        <input type="checkbox" id="checkbox-${itemId}" class="checkbox" onchange="updateTags(this)" data-name="${item.name}"> ${displayName}
-${indent}    </span>`;
-                                    if (item.children && item.children.length > 0) {
-                                        html += `${indent}    <ul class="nested">\n`;
-                                        html += createListHTML(item.children, level + 1);
-                                        html += `${indent}    </ul>\n`;
-                                    }
-                                    html += `${indent}</li>\n`;
-                                });
-                                return html;
-                            }
-
-                            // Modify the original categories array to include display names
-                            categories.forEach(category => {
-                                if (category.name === "Diseases") {
-                                    category.displayName = "Diseases (Illnesses)";
-                                    category.children.forEach(child => {
-                                        if (child.name === "Neoplasms") {
-                                            child.displayName = "Neoplasms (Tumors)";
-                                        }
-                                        if (child.name === "Cardiovascular Diseases") {
-                                            child.displayName = "Cardiovascular Diseases (Heart and blood vessel diseases)";
-                                        }
-                                        if (child.name === "Endocrine Diseases") {
-                                            child.displayName = "Endocrine Diseases (Hormone disorders)";
-                                        }
-                                        if (child.name === "Nervous System Diseases") {
-                                            child.displayName = "Nervous System Diseases";
-                                        }
-                                        if (child.name === "Mental Disorders"){
-                                            child.displayName = "Mental Disorders";
-                                        }
-                                        if (child.name === "Immune System Diseases"){
-                                            child.displayName = "Immune System Diseases";
-                                        }
-                                        if (child.name === "Digestive System Diseases"){
-                                            child.displayName = "Digestive System Diseases";
-                                        }
-                                        if (child.name === "Respiratory Tract Diseases"){
-                                            child.displayName = "Respiratory Tract Diseases (Lung diseases)";
-                                        }
-                                        if (child.name === "Skin Diseases"){
-                                            child.displayName = "Skin Diseases";
-                                        }
-                                        if (child.name === "Musculoskeletal Diseases"){
-                                            child.displayName = "Musculoskeletal Diseases";
-                                        }
-                                         if (child.name === "Urogenital Diseases"){
-                                            child.displayName = "Urogenital Diseases";
-                                        }
-                                        if (child.name === "Congenital Disorders"){
-                                            child.displayName = "Congenital Disorders (Birth defects)";
-                                        }
-                                        if (child.name === "Nutritional and Metabolic Diseases"){
-                                            child.displayName = "Nutritional and Metabolic Diseases";
-                                        }
-                                    });
-                                }
-                                if (category.name === "Chemicals and Drugs"){
-                                    category.children.forEach(child =>{
-                                        if(child.name === "Pharmaceutical Preparations"){
-                                            child.displayName = "Pharmaceutical Preparations (Medications)";
-                                        }
-                                    })
-                                }
-                                if (category.name === "Health Care"){
-                                    category.children.forEach(child => {
-                                        if (child.name === "Therapy"){
-                                            child.displayName = "Therapy (Treatment)";
-                                        }
-                                        if (child.name === "Preventive Medicine"){
-                                            child.displayName = "Preventive Medicine";
-                                        }
-                                        if (child.name === "Diagnosis"){
-                                            child.displayName = "Diagnosis";
-                                        }
-                                        if (child.name === "Medical Specialties"){
-                                            child.displayName = "Medical Specialties";
-                                        }
-                                    })
-                                }
-                                if (category.name === "Research"){
-                                     category.children.forEach(child => {
-                                        if(child.name === "Epidemiology"){
-                                            child.displayName = "Epidemiology (Study of diseases)";
-                                        }
-                                        if (child.name === "Genetics Research"){
-                                            child.displayName = "Genetics Research (Heredity study)";
-                                        }
-                                        if (child.name === "Drug Discovery"){
-                                            child.displayName = "Drug Discovery (Medicine development)";
-                                        }
-                                     })
-                                }
-                                if (category.name === "Disciplines"){
-                                    category.children.forEach(child => {
-                                        if(child.name === "Dentistry"){
-                                            child.displayName = "Dentistry (Oral care)";
-                                        }
-                                        if(child.name === "Pharmacy"){
-                                            child.displayName = "Pharmacy (Medication services)";
-                                        }
-                                    })
-                                }
-                                if (category.name === "Devices"){
-
-                                }
-                                if (category.name === "Phenomena"){
-                                     category.children.forEach(child => {
-                                        if(child.name === "Biological Phenomena"){
-                                             child.displayName = "Biological Phenomena";
-                                        }
-                                        if(child.name === "Mental Processes"){
-                                            child.displayName = "Mental Processes";
-                                        }
-                                     })
-                                }
-                                if (category.name === "Neoplasms by Site"){
-                                    category.displayName = "Neoplasms by Site (Cancers by location)";
-                                }
-                                if (category.name === "Health Occupations"){
-                                    category.displayName = "Health Occupations (Medical staff)";
-                                }
-                                if (category.name === "Legislation"){
-                                     category.displayName = "Legislation (Laws)";
-                                     category.children.forEach(child => {
-                                        if (child.name === "Health Legislation"){
-                                             child.displayName = "Health Legislation (Laws about health)";
-                                        }
-                                        if (child.name === "Drug Legislation"){
-                                            child.displayName = "Drug Legislation (Laws about medicines)";
-                                        }
-                                        if (child.name === "Environmental Legislation"){
-                                            child.displayName = "Environmental Legislation (Laws about the environment)";
-                                        }
-                                     })
-                                }
-                                if (category.name === "Education"){
-                                     category.displayName = "Education (Training)";
-                                     category.children.forEach(child => {
-                                        if (child.name === "Medical Education"){
-                                             child.displayName = "Medical Education (Training for doctors)";
-                                        }
-                                        if (child.name === "Nursing Education"){
-                                            child.displayName = "Nursing Education (Training for nurses)";
-                                        }
-                                        if (child.name === "Dental Education"){
-                                            child.displayName = "Dental Education (Training for dentists)";
-                                        }
-                                        if (child.name === "Pharmacy Education"){
-                                             child.displayName = "Pharmacy Education (Training for pharmacists)";
-                                        }
-                                     })
-                                }
-                                if (category.name === "Statistics"){
-                                     category.children.forEach(child => {
-                                        if (child.name === "Biostatistics"){
-                                             child.displayName = "Biostatistics (Statistics in biology)";
-                                        }
-                                        if (child.name === "Medical Statistics"){
-                                            child.displayName = "Medical Statistics (Statistics in medicine)";
-                                        }
-                                     })
-                                }
-                            });
-
-                            return createListHTML(categories);
-                        }
-
-                        document.write(generateMeshList());
-                    </script>
-                </ul>
-            </div>
-        </div>
+    <div class="search-wrapper">
+      <div id="suggestions"></div>
     </div>
-    <script>
-        let selectedSuggestionIndex = -1;
-
-        function toggleSection(element, evt, forceOpen = false) {
-            // Prevent collapsing if clicking the checkbox
-            if (evt && evt.target && evt.target.tagName.toLowerCase() === 'input') {
-                return;
-            }
-            let nestedList = element.nextElementSibling;
-            let icon = element.querySelector('.toggle-icon');
-            let chevronElement = element.parentElement.querySelector('.chevron');
-
-            if (nestedList && nestedList.classList.contains('nested')) {
-                let isVisible = nestedList.style.display === 'block';
-                if (forceOpen) {
-                    nestedList.style.display = 'block';
-                    icon.textContent = '−';
-                    if (chevronElement) {
-                        chevronElement.classList.add('rotate');
+    <div id="selected-items"></div>
+    <div class="collapsible-container">
+      <div class="collapsible-header" onclick="toggleCollapse()">
+        <span>Select / View Categories</span>
+        <span class="chevron"
+          ><i class="fa-solid fa-chevron-left"></i
+        ></span>
+      </div>
+      <div class="content">
+        <ul id="items-list">
+          <script>
+            function generateMeshList() {
+              const categories = [
+                {
+                  name: "Anatomy",
+                  children: [
+                    {
+                      name: "Body Regions",
+                      children: [
+                        { name: "Head" },
+                        { name: "Neck" },
+                        { name: "Thorax" },
+                        { name: "Abdomen" },
+                        { name: "Pelvis" },
+                        { name: "Extremities" },
+                      ],
+                    },
+                    {
+                      name: "Cells",
+                      children: [
+                        { name: "Blood Cells" },
+                        { name: "Nerve Cells" },
+                        { name: "Skin Cells" },
+                        { name: "Muscle Cells" },
+                      ],
+                    },
+                    {
+                      name: "Tissues",
+                      children: [
+                           {name: "Epithelial Tissue"},
+                           {name: "Connective Tissue"},
+                           {name: "Muscle Tissue"},
+                           {name: "Nervous Tissue"}
+                      ]
                     }
-                } else {
-                    nestedList.style.display = isVisible ? 'none' : 'block';
-                    icon.textContent = isVisible ? '+' : '−';
-                    if (chevronElement) {
-                        chevronElement.classList.toggle('rotate', !isVisible);
+                  ],
+                },
+                {
+                  name: "Organisms",
+                  children: [
+                    {
+                      name: "Bacteria",
+                      children: [
+                        { name: "Gram-Positive Bacteria" },
+                        { name: "Gram-Negative Bacteria" },
+                        { name: "Cocci" },
+                        { name: "Bacilli" }
+                      ],
+                    },
+                    {
+                      name: "Viruses",
+                      children: [
+                        { name: "DNA Viruses" },
+                        { name: "RNA Viruses" },
+                        { name: "Retroviruses" },
+                        { name: "Coronaviridae" }
+                      ],
+                    },
+                    {
+                      name: "Fungi",
+                      children: [
+                        { name: "Yeasts" },
+                        { name: "Molds" }
+                      ]
+                    },
+                    {
+                      name: "Animals",
+                      children: [
+                        { name: "Mammals",
+                          children: [
+                            { name: "Primates" },
+                            { name: "Rodents" },
+                            { name: "Carnivora" }
+                          ]
+                        },
+                        { name: "Reptiles" },
+                        { name: "Birds" },
+                        { name: "Fish" },
+                      ],
+                    },
+                     {
+                      name: "Plants",
+                      children:[
+                          {name:"Angiosperms"},
+                          {name:"Gymnosperms"}
+                      ]
                     }
+                  ],
+                },
+                {
+                  name: "Diseases",
+                  displayName: "Diseases (Illnesses)",
+                  children: [
+                    {
+                      name: "Infectious Diseases",
+                      children: [
+                        {
+                          name: "Bacterial Infections",
+                          children: [
+                            { name: "Pneumonia (Lung infection)" },
+                            { name: "Tuberculosis (TB)" },
+                            { name: "Meningitis (Brain infection)" }
+                          ]
+                        },
+                        {
+                          name: "Viral Infections",
+                          children:[
+                            { name: "Influenza (Flu)" },
+                            { name: "HIV Infection (AIDS)" },
+                            { name: "Hepatitis (Liver inflammation)" }
+                          ]
+                        },
+                        { name: "Fungal Infections" },
+                        { name: "Parasitic Diseases" }
+                      ],
+                    },
+                    {
+                      name: "Neoplasms",
+                      displayName: "Neoplasms (Tumors)",
+                      children: [
+                        { name: "Carcinoma (Cancer of epithelial tissue)" },
+                        { name: "Sarcoma (Cancer of connective tissue)" },
+                        { name: "Lymphoma (Cancer of the lymphatic system)" },
+                        { name: "Leukemia (Cancer of blood-forming tissue)" }
+                      ],
+                    },
+                    {
+                      name: "Cardiovascular Diseases",
+                      displayName: "Cardiovascular Diseases (Heart and blood vessel diseases)",
+                      children: [
+                        { name: "Hypertension (High blood pressure)" },
+                        { name: "Coronary Artery Disease (Heart disease)" },
+                        { name: "Heart Failure" },
+                        { name: "Stroke (Brain attack)" }
+                      ],
+                    },
+                    {
+                      name: "Endocrine Diseases",
+                      displayName: "Endocrine Diseases (Hormone disorders)",
+                      children: [
+                        { name: "Diabetes Mellitus (High blood sugar)" },
+                        { name: "Hypothyroidism (Underactive thyroid)" },
+                        { name: "Hyperthyroidism (Overactive thyroid)" }
+                      ]
+                    },
+                    {
+                      name: "Nervous System Diseases",
+                      displayName: "Nervous System Diseases",
+                      children: [
+                        { name:"Alzheimer's Disease (Memory loss)" },
+                        { name: "Parkinson's Disease (Movement disorder)" },
+                        { name: "Epilepsy (Seizures)" },
+                        { name: "Multiple Sclerosis (Nerve damage)" }
+                      ]
+                    },
+                    {
+                      name: "Mental Disorders",
+                      displayName: "Mental Disorders",
+                      children: [
+                        { name:"Depression (Mood disorder)" },
+                        { name:"Anxiety Disorders" },
+                        { name:"Schizophrenia" },
+                        { name:"Bipolar Disorder (Manic depression)" }
+                      ]
+                    },
+                    {
+                      name: "Immune System Diseases",
+                      displayName: "Immune System Diseases",
+                      children: [
+                        { name: "Autoimmune Diseases",
+                          children: [
+                            { name: "Rheumatoid Arthritis (Joint inflammation)" },
+                            { name: "Lupus (Connective tissue disease)" }
+                          ]
+                        },
+                        { name: "Immunodeficiency Disorders (Weak immune system)" },
+                        { name: "Allergies" }
+                      ]
+                    },
+                    {
+                      name: "Digestive System Diseases",
+                      displayName: "Digestive System Diseases",
+                      children: [
+                        { name: "Gastroenteritis (Stomach flu)" },
+                        { name: "Peptic Ulcer (Stomach/intestinal ulcer)" },
+                        { name: "Irritable Bowel Syndrome (IBS)" }
+                      ]
+                    },
+                    {
+                      name: "Respiratory Tract Diseases",
+                      displayName: "Respiratory Tract Diseases (Lung diseases)",
+                      children: [
+                        { name: "Asthma" },
+                        { name: "Chronic Obstructive Pulmonary Disease (COPD)" },
+                        { name: "Pneumonia (Lung infection)" }
+                      ]
+                    },
+                    {
+                      name: "Skin Diseases",
+                      displayName: "Skin Diseases",
+                      children: [
+                        { name: "Eczema (Skin inflammation)" },
+                        { name: "Psoriasis (Skin scaling)" },
+                        { name: "Acne" }
+                      ]
+                    },
+                    {
+                      name: "Musculoskeletal Diseases",
+                      displayName: "Musculoskeletal Diseases",
+                      children:[
+                        { name:"Arthritis (Joint inflammation)" },
+                        { name:"Osteoporosis (Weak bones)" }
+                      ]
+                    },
+                    {
+                      name: "Urogenital Diseases",
+                      displayName: "Urogenital Diseases",
+                      children: [
+                        { name:"Kidney Diseases" },
+                        { name:"Urinary Tract Infections (UTIs)" },
+                        { name:"Sexually Transmitted Diseases (STDs)" }
+                      ]
+                    },
+                    {
+                      name: "Congenital Disorders",
+                      displayName: "Congenital Disorders (Birth defects)",
+                      children: [
+                        { name:"Down Syndrome" },
+                        { name:"Cystic Fibrosis" },
+                        { name: "Spina Bifida" }
+                      ]
+                    },
+                    {
+                      name: "Nutritional and Metabolic Diseases",
+                      displayName: "Nutritional and Metabolic Diseases",
+                      children: [
+                        { name: "Obesity" },
+                        { name: "Malnutrition" },
+                        { name: "Diabetes Mellitus" }
+                      ]
+                    }
+                  ],
+                },
+                {
+                  name: "Chemicals and Drugs",
+                  children: [
+                    {
+                      name: "Inorganic Chemicals",
+                      children: [
+                        { name: "Acids" },
+                        { name: "Bases" },
+                        { name: "Salts" },
+                        { name: "Metals" },
+                        { name: "Non-Metals" }
+                      ]
+                    },
+                    {
+                      name: "Organic Chemicals",
+                      children: [
+                        { name: "Hydrocarbons" },
+                        { name: "Alcohols" },
+                        { name: "Aldehydes" },
+                         { name:"Ketones" },
+                        { name: "Carboxylic Acids" },
+                        { name: "Amines" },
+                        { name: "Amides" },
+                        { name: "Esters" }
+                      ]
+                    },
+                    {
+                      name: "Pharmaceutical Preparations",
+                      displayName: "Pharmaceutical Preparations (Medications)",
+                      children: [
+                        { name: "Analgesics (Pain relievers)" },
+                        { name: "Anesthetics (Numbing agents)" },
+                        { name: "Anti-Inflammatory Agents" },
+                        { name: "Antibiotics" },
+                        { name: "Antiviral Agents" },
+                        { name: "Antineoplastic Agents (Chemotherapy)" },
+                        { name: "Cardiovascular Agents (Heart medications)" },
+                        { name: "Central Nervous System Agents" },
+                        { name: "Hormones" },
+                        { name: "Vitamins" }
+                      ]
+                    },
+                    {
+                      name: "Drugs",
+                      children: [
+                        { name: "Street Drugs" },
+                        { name: "Prescription Drugs" },
+                        { name: "Over-the-Counter Drugs" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Health Care",
+                  children: [
+                    {
+                      name: "Preventive Medicine",
+                      displayName: "Preventive Medicine",
+                      children: [
+                        { name: "Vaccination (Immunization)" },
+                        { name: "Screening (Medical tests)" },
+                        { name: "Health Promotion" }
+                      ]
+                    },
+                    {
+                      name: "Diagnosis",
+                      displayName: "Diagnosis",
+                      children: [
+                        { name: "Laboratory Tests (Blood tests, etc.)" },
+                        { name: "Diagnostic Imaging (X-rays, etc.)" },
+                        { name: "Physical Examination" }
+                      ]
+                    },
+                    {
+                      name: "Therapy",
+                      displayName: "Therapy (Treatment)",
+                      children: [
+                        { name: "Drug Therapy (Medication)" },
+                        { name: "Surgery" },
+                        { name: "Radiation Therapy (Cancer treatment)" },
+                        { name: "Physical Therapy" },
+                        { name: "Psychotherapy (Mental health therapy)" }
+                      ]
+                    },
+                    {
+                      name: "Rehabilitation",
+                      children:[
+                          { name: "Occupational Therapy" },
+                          { name: "Speech Therapy" }
+                      ]
+                    },
+                    {
+                      name: "Hospitals",
+                      children: [
+                        { name: "General Hospitals" },
+                        { name: "Specialized Hospitals" },
+                        { name: "Teaching Hospitals" }
+                      ]
+                    },
+                    {
+                      name: "Medical Specialties",
+                      displayName: "Medical Specialties",
+                      children: [
+                        { name: "Cardiology (Heart)" },
+                        { name: "Dermatology (Skin)" },
+                        { name: "Gastroenterology (Digestive system)" },
+                        { name: "Neurology (Nerves)" },
+                        { name: "Oncology (Cancer)" },
+                        { name: "Pediatrics (Children)" },
+                        { name: "Psychiatry (Mental health)" },
+                        { name: "Surgery" },
+                        { name: "Urology (Urinary system)" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Research",
+                  children: [
+                    {
+                      name: "Biomedical Research",
+                      children: [
+                        { name: "Basic Research" },
+                        { name: "Clinical Research" },
+                        { name: "Translational Research" }
+                      ]
+                    },
+                    {
+                      name: "Epidemiology",
+                      displayName: "Epidemiology (Study of diseases)",
+                      children: [
+                        { name: "Descriptive Epidemiology" },
+                        { name: "Analytic Epidemiology" },
+                        { name: "Experimental Epidemiology" }
+                      ]
+                    },
+                    {
+                      name: "Genetics Research",
+                      displayName: "Genetics Research (Heredity study)",
+                      children: [
+                        { name: "Molecular Genetics" },
+                        { name: "Population Genetics" },
+                        { name: "Medical Genetics" }
+                      ]
+                    },
+                    {
+                      name: "Drug Discovery",
+                      displayName: "Drug Discovery (Medicine development)",
+                      children: [
+                        { name: "Target Identification" },
+                        { name: "Lead Optimization" },
+                        { name: "Clinical Trials" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Disciplines",
+                  children: [
+                    {
+                      name: "Medicine",
+                      children: [
+                        { name: "Internal Medicine" },
+                        { name: "Family Medicine" },
+                        { name: "Emergency Medicine" }
+                      ]
+                    },
+                    {
+                      name: "Dentistry",
+                      displayName: "Dentistry (Oral care)",
+                      children: [
+                        { name: "Orthodontics (Braces)" },
+                        { name: "Periodontics (Gum care)" },
+                        { name: "Endodontics (Root canals)" }
+                      ]
+                    },
+                    {
+                      name: "Nursing",
+                      children: [
+                        { name: "Critical Care Nursing" },
+                        { name: "Pediatric Nursing" },
+                        { name: "Geriatric Nursing" }
+                      ]
+                    },
+                    {
+                      name: "Pharmacy",
+                      displayName: "Pharmacy (Medication services)",
+                      children: [
+                        { name: "Community Pharmacy" },
+                        { name: "Hospital Pharmacy" },
+                        { name: "Clinical Pharmacy" }
+                      ]
+                    },
+                    {
+                      name: "Public Health",
+                      children: [
+                        { name: "Epidemiology" },
+                        { name: "Biostatistics" },
+                        { name: "Health Policy" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Devices",
+                  children: [
+                    {
+                      name: "Therapeutic Devices",
+                      children: [
+                        { name: "Implants" },
+                        { name: "Prostheses (Artificial limbs)" },
+                        { name: "Assistive Devices" }
+                      ]
+                    },
+                    {
+                      name: "Diagnostic Devices",
+                      children: [
+                        { name: "Imaging Equipment (Scanners)" },
+                        { name: "Laboratory Equipment" },
+                        { name: "Monitoring Devices" }
+                      ]
+                    },
+                    {
+                      name: "Surgical Instruments",
+                      children: [
+                        { name: "Cutting Instruments" },
+                        { name: "Grasping Instruments" },
+                        { name: "Retractors" }
+                      ]
+                    },
+                    {
+                      name: "Dental Equipment",
+                      children: [
+                        { name: "Dental Drills" },
+                        { name: "Dental Lasers" },
+                        { name: "Dental Chairs" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Phenomena",
+                  children: [
+                    {
+                      name: "Biological Phenomena",
+                      displayName: "Biological Phenomena",
+                      children: [
+                        { name: "Aging" },
+                        { name: "Apoptosis (Cell death)" },
+                        { name: "Inflammation" },
+                        { name: "Immunity" }
+                      ]
+                    },
+                    {
+                      name: "Physical Phenomena",
+                      children: [
+                        { name: "Gravity" },
+                        { name: "Pressure" },
+                        { name: "Temperature" },
+                        { name: "Radiation" }
+                      ]
+                    },
+                     {
+                      name: "Chemical Phenomena",
+                      children: [
+                        { name: "Catalysis" },
+                        { name: "Chemical Reactions" },
+                        { name: "Diffusion" }
+                      ]
+                    },
+                    {
+                      name: "Mental Processes",
+                      displayName: "Mental Processes",
+                      children: [
+                        { name: "Cognition (Thinking)" },
+                        { name: "Emotion (Feelings)" },
+                        { name: "Motivation" },
+                        { name: "Perception (Senses)" }
+                      ]
+                    }
+                  ]
+                },
+                 {
+                  name: "Publications",
+                  children: [
+                    { name: "Journal Articles" },
+                    { name: "Books" },
+                    { name: "Review Articles" },
+                    { name: "Clinical Trials" }
+                  ]
+                },
+                {
+                  name: "Named Groups",
+                  children: [
+                    { name: "Ethnic Groups" },
+                    { name: "Occupational Groups" },
+                    { name: "Religious Groups" },
+                    { name: "Age Groups" }
+                  ]
+                },
+                {
+                  name: "Organizations",
+                  children: [
+                    { name: "Government Agencies" },
+                    { name: "Non-profit Organizations" },
+                    { name: "Professional Organizations" },
+                    { name: "International Organizations" }
+                  ]
+                },
+                {
+                  name: "Health Occupations",
+                  displayName: "Health Occupations (Medical staff)",
+                  children: [
+                    { name: "Physicians (Doctors)" },
+                    { name: "Nurses" },
+                    { name: "Dentists" },
+                    { name: "Pharmacists (Drug specialists)" },
+                    { name: "Allied Health Personnel" }
+                  ]
+                },
+                {
+                  name: "Anatomical Terms",
+                  children: [
+                    { name: "Anatomical Planes" },
+                    { name: "Anatomical Regions" },
+                    { name: "Directional Terms" },
+                    { name: "Movements" }
+                  ]
+                },
+                {
+                  name: "Enzymes",
+                  children: [
+                    { name: "Oxidoreductases" },
+                    { name: "Transferases" },
+                    { name: "Hydrolases" },
+                    { name: "Lyases" },
+                    { name: "Isomerases" },
+                    { name: "Ligases" }
+                  ]
+                },
+                {
+                  name: "Hormones",
+                  children: [
+                    { name: "Peptide Hormones" },
+                    { name: "Steroid Hormones" },
+                    { name: "Amino Acid Derivatives" }
+                  ]
+                },
+                {
+                  name: "Immunologic Factors",
+                  children: [
+                    { name: "Antibodies" },
+                    { name: "Antigens" },
+                    { name: "Cytokines" },
+                    { name: "Complement System" }
+                  ]
+                },
+                {
+                  name: "Neoplasms by Site",
+                  displayName: "Neoplasms by Site (Cancers by location)",
+                  children: [
+                    { name: "Head and Neck Neoplasms (Head and neck cancers)" },
+                    { name: "Respiratory Tract Neoplasms (Lung cancers)" },
+                    { name: "Digestive System Neoplasms (Stomach, colon cancers)" },
+                    { name: "Urogenital Neoplasms (Bladder, prostate cancers)" },
+                    { name: "Skin Neoplasms (Skin cancers)" },
+                    { name: "Breast Neoplasms (Breast cancer)" },
+                    { name: "Endocrine Neoplasms (Gland cancers)" },
+                    { name: "Nervous System Neoplasms (Brain cancers)" },
+                    { name: "Musculoskeletal Neoplasms (Bone, muscle cancers)" },
+                    { name: "Hematologic Neoplasms (Blood cancers)" }
+                  ]
+                },
+                {
+                  name: "Wounds and Injuries",
+                  children: [
+                    { name: "Fractures (Broken bones)" },
+                    { name: "Burns" },
+                    { name: "Lacerations (Cuts)" },
+                    { name: "Contusions (Bruises)" },
+                    { name: "Sprains and Strains" }
+                  ]
+                },
+                {
+                  name: "Substances",
+                  children: [
+                    { name: "Elements" },
+                    { name: "Chemical Compounds" },
+                    { name: "Mixtures" },
+                    { name: "Solutions" }
+                  ]
+                },
+                {
+                  name: "Geographic Locations",
+                  children: [
+                    { name: "Continents" },
+                    { name: "Countries" },
+                    { name: "Regions" },
+                    { name: "Cities" }
+                  ]
+                },
+                {
+                  name: "Time",
+                  children: [
+                    { name: "Years" },
+                    { name: "Months" },
+                    { name: "Days" },
+                     { name: "Hours" },
+                    { name: "Minutes" },
+                    { name: "Seconds" }
+                  ]
+                },
+                {
+                  name: "Information Science",
+                  children: [
+                    { name: "Information Storage and Retrieval" },
+                    { name: "Library Science" },
+                    { name: "Medical Informatics" },
+                    { name: "Bioinformatics" }
+                  ]
+                },
+                {
+                  name: "Named Groups",
+                  children: [
+                    { name: "Patient Population" },
+                    { name: "Healthcare Personnel (Medical staff)" },
+                    { name: "Research Personnel (Scientists)" },
+                    { name: "General Population (Public)" }
+                  ]
+                },
+                {
+                  name: "Industries",
+                  children: [
+                    { name: "Pharmaceutical Industry (Drug companies)" },
+                    { name: "Biotechnology Industry" },
+                    { name: "Healthcare Industry (Hospitals, clinics)" },
+                    { name: "Medical Device Industry" }
+                  ]
+                },
+                {
+                  name: "Occupations",
+                  children: [
+                    { name: "Physicians (Doctors)" },
+                    { name: "Nurses" },
+                    { name: "Dentists" },
+                    { name: "Pharmacists (Drug specialists)" },
+                    { name: "Scientists" },
+                    { name: "Researchers" }
+                  ]
+                },
+                {
+                  name: "Organizations",
+                  children: [
+                    { name: "Hospitals" },
+                    { name: "Universities" },
+                    { name: "Research Institutes" },
+                    { name: "Government Agencies" },
+                    { name: "Professional Societies" }
+                  ]
+                },
+                {
+                  name: "Social Sciences",
+                  children: [
+                    { name: "Sociology" },
+                    { name: "Psychology" },
+                    { name: "Economics" },
+                    { name: "Anthropology" }
+                  ]
+                },
+                {
+                  name: "Technology",
+                  children: [
+                    { name: "Biotechnology" },
+                    { name: "Medical Technology" },
+                    { name: "Information Technology" },
+                    { name: "Nanotechnology" }
+                  ]
+                },
+                {
+                  name: "Legislation",
+                  displayName: "Legislation (Laws)",
+                  children: [
+                    { name: "Health Legislation",
+                      displayName: "Health Legislation (Laws about health)" },
+                    { name: "Drug Legislation",
+                      displayName: "Drug Legislation (Laws about medicines)" },
+                    { name: "Environmental Legislation",
+                      displayName: "Environmental Legislation (Laws about the environment)" }
+                  ]
+                },
+                {
+                  name: "Ethics",
+                  children: [
+                    { name: "Medical Ethics" },
+                    { name: "Research Ethics" },
+                    { name: "Bioethics" }
+                  ]
+                },
+                {
+                  name: "Religion",
+                  children: [
+                    { name: "Christianity" },
+                    { name: "Islam" },
+                    { name: "Judaism" },
+                    { name: "Hinduism" },
+                    { name: "Buddhism" }
+                  ]
+                },
+                {
+                  name: "Philosophy",
+                  children: [
+                    { name: "Medical Philosophy" },
+                    { name: "Philosophy of Science" }
+                  ]
+                },
+                {
+                  name: "Education",
+                  displayName: "Education (Training)",
+                  children: [
+                    {
+                      name: "Medical Education",
+                      displayName: "Medical Education (Training for doctors)"
+                    },
+                    {
+                      name: "Nursing Education",
+                      displayName: "Nursing Education (Training for nurses)"
+                    },
+                    {
+                      name: "Dental Education",
+                      displayName: "Dental Education (Training for dentists)"
+                    },
+                    {
+                      name: "Pharmacy Education",
+                      displayName: "Pharmacy Education (Training for pharmacists)"
+                    }
+                  ]
+                },
+                {
+                  name: "Economics",
+                  children: [
+                    { name: "Health Economics" },
+                    { name: "Pharmacoeconomics" }
+                  ]
+                },
+                {
+                  name: "Politics",
+                  children: [
+                    { name: "Health Policy (Government health plans)" },
+                    { name: "Drug Policy (Government rules on medicines)" }
+                  ]
+                },
+                {
+                  name: "History",
+                  children: [
+                    { name: "History of Medicine" },
+                    { name: "History of Science" }
+                  ]
+                },
+                {
+                  name: "Statistics",
+                  children: [
+                    {
+                      name: "Biostatistics",
+                      displayName: "Biostatistics (Statistics in biology)"
+                    },
+                    {
+                      name: "Medical Statistics",
+                      displayName: "Medical Statistics (Statistics in medicine)"
+                    }
+                  ]
+                },
+                {
+                  name: "Behavior and Behavior Mechanisms",
+                  children: [
+                    { name: "Behavior, Animal" },
+                    { name: "Behavior, Social" },
+                    { name: "Feeding Behavior" },
+                    { name: "Sexual Behavior" }
+                  ]
+                },
+                {
+                  name: "Named Concepts",
+                  children: [
+                    { name: "Health" },
+                    { name: "Disease" },
+                    { name: "Illness" },
+                    { name: "Pain" },
+                    { name: "Quality of Life" }
+                  ]
                 }
-            }
-        }
+              ];
 
-        function updateTags(checkbox) {
-            let selectedItems = document.getElementById('selected-items');
-            let itemName = checkbox.getAttribute('data-name');
+              function createListHTML(arr, level = 0) {
+                let html = "";
+                const indent = "    ".repeat(level);
 
-            if (checkbox.checked) {
-                let tag = document.createElement('span');
-                tag.className = 'tag';
-                tag.textContent = itemName;
-
-                // Store the checkbox's ID so we can scroll to it later.
-                tag.setAttribute('data-checkbox-id', checkbox.id);
-
-                // Create the '×' remove button
-                let removeBtn = document.createElement('span');
-                removeBtn.className = 'remove';
-                removeBtn.textContent = ' ×';
-                removeBtn.onclick = function() {
-                    checkbox.checked = false;
-                    selectedItems.removeChild(tag);
-                };
-                tag.appendChild(removeBtn);
-
-                // ------------------------
-                // NEW: When the *blue area* of the tag is clicked, expand & scroll to its checkbox
-                // ------------------------
-                tag.onclick = function(e) {
-                    // If the target *is* the remove button, do nothing special:
-                    if (e.target === removeBtn) return;
-
-                    // Otherwise, expand the tree to this checkbox and scroll into view
-                    expandToCheckbox(checkbox);
-                    const itemElement = document.getElementById(checkbox.id);
-                    if (itemElement) {
-                        itemElement.scrollIntoView({
-                            behavior: "smooth",
-                            block: "center"
-                        });
-                    }
-                };
-
-                selectedItems.appendChild(tag);
-
-            } else {
-                let tags = document.querySelectorAll('.tag');
-                tags.forEach(tag => {
-                    if (tag.textContent.startsWith(itemName)) {
-                        tag.remove();
-                    }
+                arr.forEach((item, index) => {
+                  const itemId =
+                    item.id ||
+                    `${item.name.replace(/[^a-zA-Z0-9]/g, "")} -${level}-${index}`;
+                  const displayName = item.displayName || item.name;
+                  html += `${indent}<li>\n${indent}    <span class="collapsible" onclick="toggleSection(this, event)">\n${indent}        <span class="toggle-icon">+</span>\n${indent}        <input type="checkbox" id="checkbox-${itemId}" class="checkbox" onchange="updateTags(this)" data-name="${item.name}"> ${displayName}\n${indent}    </span>`;
+                  if (item.children && item.children.length > 0) {
+                    html += `${indent}    <ul class="nested">\n`;
+                    html += createListHTML(item.children, level + 1);
+                    html += `${indent}    </ul>\n`;
+                  }
+                  html += `${indent}</li>\n`;
                 });
-            }
-        }
+                return html;
+              }
 
-        function expandToCheckbox(checkbox) {
-            let parent = checkbox.closest('ul');
-            while (parent) {
-                let collapsible = parent.previousElementSibling;
-                if (collapsible && collapsible.classList.contains('collapsible')) {
-                    toggleSection(collapsible, null, true);
-                }
-                parent = parent.parentElement && parent.parentElement.closest('ul');
-            }
-        }
-
-        function handleSearchAndNavigation(event) {
-            const searchBar = document.getElementById("search-bar");
-            const suggestions = document.getElementById("suggestions");
-            const suggestionList = suggestions.getElementsByClassName("suggestion");
-
-            // Arrow key navigation
-            if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter") {
-                event.preventDefault();
-
-                if (suggestions.style.display === "none" || suggestionList.length === 0) return;
-
-                if (event.key === "ArrowDown") {
-                    selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestionList.length - 1);
-                } else if (event.key === "ArrowUp") {
-                    selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, 0);
-                } else if (event.key === "Enter" && selectedSuggestionIndex !== -1) {
-                    const checkboxId = suggestionList[selectedSuggestionIndex].getAttribute("data-checkbox-id");
-                    const checkbox = document.getElementById(checkboxId);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                        updateTags(checkbox);
-                        expandToCheckbox(checkbox);
-                    }
-                    searchBar.value = "";
-                    suggestions.style.display = "none";
-                    selectedSuggestionIndex = -1;
-                    return;
-                }
-
-                for (let i = 0; i < suggestionList.length; i++) {
-                    suggestionList[i].classList.remove("active");
-                }
-                if (selectedSuggestionIndex !== -1) {
-                    suggestionList[selectedSuggestionIndex].classList.add("active");
-                }
-                return;
+              return createListHTML(categories);
             }
 
-            // Handle text input for live search
-            setTimeout(() => {
-                const query = searchBar.value.toLowerCase();
-                suggestions.innerHTML = "";
-                selectedSuggestionIndex = -1;
+            document.write(generateMeshList());
+          </script>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script>
+    let selectedSuggestionIndex = -1;
 
-                if (query === "") {
-                    suggestions.style.display = "none";
-                    return;
-                }
+    function toggleSection(element, evt, forceOpen = false) {
+      // Prevent collapsing if clicking the checkbox
+      if (evt && evt.target && evt.target.tagName.toLowerCase() === "input") {
+        return;
+      }
+      let nestedList = element.nextElementSibling;
+      let icon = element.querySelector(".toggle-icon");
+      let chevronElement = element.parentElement.querySelector(".chevron");
 
-                let found = false;
-                document.querySelectorAll(".checkbox").forEach((checkbox) => {
-                    const name = checkbox.getAttribute("data-name");
-                    if (name.toLowerCase().includes(query)) {
-                        const div = document.createElement("div");
-                        div.className = "suggestion";
-                        div.textContent = name;
-                        div.setAttribute("data-checkbox-id", checkbox.id);
-                        div.onclick = function () {
-                            checkbox.checked = true;
-                            updateTags(checkbox);
-                            expandToCheckbox(checkbox);
-                            searchBar.value = "";
-                            suggestions.style.display = "none";
-                            selectedSuggestionIndex = -1;
-                        };
-                        suggestions.appendChild(div);
-                        found = true;
-                    }
-                });
+      if (nestedList && nestedList.classList.contains("nested")) {
+        let isVisible = nestedList.style.display === "block";
+        if (forceOpen) {
+          nestedList.style.display = "block";
+          icon.textContent = "−";
+          if (chevronElement) {
+            chevronElement.classList.add("rotate");
+          }
+        } else {
+          nestedList.style.display = isVisible ? "none" : "block";
+          icon.textContent = isVisible ? "+" : "−";
+          if (chevronElement) {
+            chevronElement.classList.toggle("rotate", !isVisible);
+          }
+        }
+      }
+    }
 
-                suggestions.style.display = found ? "block" : "none";
-            }, 0);
+    function updateTags(checkbox) {
+      let selectedItems = document.getElementById("selected-items");
+      let itemName = checkbox.getAttribute("data-name");
+
+      // NEW: Get the parent <li>
+      const liParent = checkbox.closest("li");
+
+      if (checkbox.checked) {
+        // NEW: Add the "checked" class to <li>
+        liParent.classList.add("checked");
+
+        let tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = itemName;
+
+        // Store the checkbox's ID so we can scroll to it later.
+        tag.setAttribute("data-checkbox-id", checkbox.id);
+
+        // Create the '×' remove button
+        let removeBtn = document.createElement("span");
+        removeBtn.className = "remove";
+        removeBtn.textContent = " ×";
+        removeBtn.onclick = function () {
+          checkbox.checked = false;
+          selectedItems.removeChild(tag);
+
+          // NEW: remove the "checked" class
+          liParent.classList.remove("checked");
+        };
+        tag.appendChild(removeBtn);
+
+        // When the blue area of the tag is clicked, expand & scroll to checkbox
+        tag.onclick = function (e) {
+          if (e.target === removeBtn) return;
+          expandToCheckbox(checkbox);
+          const itemElement = document.getElementById(checkbox.id);
+          if (itemElement) {
+            itemElement.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }
+        };
+
+        selectedItems.appendChild(tag);
+      } else {
+        // Unchecked scenario
+        liParent.classList.remove("checked"); // NEW: remove highlight
+
+        let tags = document.querySelectorAll(".tag");
+        tags.forEach((tag) => {
+          if (tag.textContent.startsWith(itemName)) {
+            tag.remove();
+          }
+        });
+      }
+    }
+
+    function expandToCheckbox(checkbox) {
+      let parent = checkbox.closest("ul");
+      while (parent) {
+        let collapsible = parent.previousElementSibling;
+        if (collapsible && collapsible.classList.contains("collapsible")) {
+          toggleSection(collapsible, null, true);
+        }
+        parent = parent.parentElement && parent.parentElement.closest("ul");
+      }
+    }
+
+    function handleSearchAndNavigation(event) {
+      const searchBar = document.getElementById("search-bar");
+      const suggestions = document.getElementById("suggestions");
+      const suggestionList = suggestions.getElementsByClassName("suggestion");
+
+      // Arrow key navigation
+      if (
+        event.key === "ArrowDown" ||
+        event.key === "ArrowUp" ||
+        event.key === "Enter"
+      ) {
+        event.preventDefault();
+
+        if (suggestions.style.display === "none" || suggestionList.length === 0)
+          return;
+
+        if (event.key === "ArrowDown") {
+          selectedSuggestionIndex = Math.min(
+            selectedSuggestionIndex + 1,
+            suggestionList.length - 1
+          );
+        } else if (event.key === "ArrowUp") {
+          selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, 0);
+        } else if (event.key === "Enter" && selectedSuggestionIndex !== -1) {
+          const checkboxId = suggestionList[selectedSuggestionIndex].getAttribute(
+            "data-checkbox-id"
+          );
+          const checkbox = document.getElementById(checkboxId);
+          if (checkbox) {
+            checkbox.checked = true;
+            updateTags(checkbox);
+            expandToCheckbox(checkbox);
+          }
+          searchBar.value = "";
+          suggestions.style.display = "none";
+          selectedSuggestionIndex = -1;
+          return;
         }
 
-        function toggleCollapse() {
-            const content = document.querySelector(".content");
-            const chevron = document.querySelector(".chevron");
-            content.classList.toggle("expanded");
-            chevron.classList.toggle("rotate");
-            if (content.classList.contains("expanded")) {
-                chevron.style.transform = "rotate(-90deg)";
-            } else {
-                chevron.style.transform = "rotate(0deg)";
-            }
+        for (let i = 0; i < suggestionList.length; i++) {
+          suggestionList[i].classList.remove("active");
         }
-    </script>
+        if (selectedSuggestionIndex !== -1) {
+          suggestionList[selectedSuggestionIndex].classList.add("active");
+        }
+        return;
+      }
+
+      // Handle text input for live search
+      setTimeout(() => {
+        const query = searchBar.value.toLowerCase();
+        suggestions.innerHTML = "";
+        selectedSuggestionIndex = -1;
+
+        if (query === "") {
+          suggestions.style.display = "none";
+          return;
+        }
+
+        let found = false;
+        document.querySelectorAll(".checkbox").forEach((checkbox) => {
+          const name = checkbox.getAttribute("data-name");
+          if (name.toLowerCase().includes(query)) {
+            const div = document.createElement("div");
+            div.className = "suggestion";
+            div.textContent = name;
+            div.setAttribute("data-checkbox-id", checkbox.id);
+            div.onclick = function () {
+              checkbox.checked = true;
+              updateTags(checkbox);
+              expandToCheckbox(checkbox);
+              searchBar.value = "";
+              suggestions.style.display = "none";
+              selectedSuggestionIndex = -1;
+            };
+            suggestions.appendChild(div);
+            found = true;
+          }
+        });
+
+        suggestions.style.display = found ? "block" : "none";
+      }, 0);
+    }
+
+    function toggleCollapse() {
+      const content = document.querySelector(".content");
+      const chevron = document.querySelector(".chevron");
+      content.classList.toggle("expanded");
+      chevron.classList.toggle("rotate");
+      if (content.classList.contains("expanded")) {
+        chevron.style.transform = "rotate(-90deg)";
+      } else {
+        chevron.style.transform = "rotate(0deg)";
+      }
+    }
+  </script>
 </body>
 </html>
