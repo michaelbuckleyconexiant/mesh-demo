@@ -38,7 +38,7 @@
             margin-right: 8px;
             text-align: center;
             font-weight: bold;
-            background: black;
+            background: #007bff;
             color: white;
             border-radius: 50%;
             line-height: 20px;
@@ -197,14 +197,14 @@
                     <script>
                         function generateList(letter) {
                             let html = `<li>
-                                            <span class="collapsible" onclick="toggleSection(this)">
+                                            <span class="collapsible" onclick="toggleSection(this, event)">
                                                 <span class="toggle-icon">+</span>
                                                 <input type="checkbox" id="checkbox-${letter}" class="checkbox" onchange="updateTags(this)" data-name="${letter}"> ${letter}
                                             </span>
                                             <ul class="nested">`;
                             for (let i = 1; i <= 5; i++) {
                                 html += `<li>
-                                                <span class="collapsible" onclick="toggleSection(this)">
+                                                <span class="collapsible" onclick="toggleSection(this, event)">
                                                     <span class="toggle-icon">+</span>
                                                     <input type="checkbox" id="checkbox-${letter}${i}" class="checkbox" onchange="updateTags(this)" data-name="${letter}${i}"> ${letter}${i}
                                                 </span>
@@ -235,7 +235,11 @@
     <script>
         let selectedSuggestionIndex = -1;
 
-        function toggleSection(element, forceOpen = false) {
+        function toggleSection(element, evt, forceOpen = false) {
+            // Prevent collapsing if clicking the checkbox
+            if (evt && evt.target && evt.target.tagName.toLowerCase() === 'input') {
+                return;
+            }
             let nestedList = element.nextElementSibling;
             let icon = element.querySelector('.toggle-icon');
             let chevronElement = element.parentElement.querySelector('.chevron');
@@ -315,7 +319,7 @@
             while (parent) {
                 let collapsible = parent.previousElementSibling;
                 if (collapsible && collapsible.classList.contains('collapsible')) {
-                    toggleSection(collapsible, true);
+                    toggleSection(collapsible, null, true);
                 }
                 parent = parent.parentElement && parent.parentElement.closest('ul');
             }
