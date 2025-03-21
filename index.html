@@ -1,593 +1,3 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collapsible Tier Structure</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-        }
-
-        ul {
-            list-style-type: none;
-            padding-left: 20px;
-        }
-
-        .collapsible {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            font-size: 18px;
-        }
-
-        .toggle-icon {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-            margin-right: 8px;
-            text-align: center;
-            font-weight: bold;
-            background: black;
-            color: white;
-            border-radius: 50%;
-            line-height: 20px;
-        }
-
-        .checkbox {
-            margin-left: 8px;
-            margin-right: 8px;
-        }
-
-        .nested {
-            display: none;
-            padding-left: 20px;
-        }
-
-        .nested .nested {
-            padding-left: 40px;
-        }
-
-        .active > .nested {
-            display: block;
-        }
-
-        #selected-items {
-            margin-bottom: 20px;
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 5px 10px;
-            margin: 5px;
-            background: #007bff;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .tag .remove {
-            margin-left: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #search-bar {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-            display: block;
-        }
-
-        #suggestions {
-            border: 1px solid #ccc;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-            background: white;
-            position: absolute;
-            width: 100%;
-        }
-
-        .suggestion {
-            padding: 8px;
-            cursor: pointer;
-        }
-
-        .suggestion:hover, .suggestion.active {
-            background: #ddd;
-        }
-
-        .collapsible-container {
-            width: 100%;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin: 0 auto;
-            height: 100%;
-        }
-
-        .collapsible-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #007bff;
-            color: white;
-            padding: 12px 16px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .chevron {
-            transition: transform 0.3s ease;
-            display: inline-block;
-            font-size: 20px;
-            transform: rotate(0deg); /* Initial rotation set to 0 degrees */
-        }
-
-        .content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-            background: white;
-            padding: 0 16px;
-            height: 400px;
-            overflow-y: scroll;
-        }
-
-        .content table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .content th, .content td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .expanded {
-            max-height: 100%;
-            padding: 12px 16px;
-        }
-
-        .rotate {
-            transform: rotate(90deg); /* Rotate 90 degrees for down state */
-        }
-
-        .main-wrapper {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 50px 30px;
-            position: relative;
-        }
-        .search-wrapper {
-    position: relative;
-}
-    </style>
-</head>
-<body>
-    <div class="main-wrapper">
-        <h2 style="margin-bottom: 15px; display: block;">Catagories</h2>
-        <input type="text" id="search-bar" placeholder="Search..." onkeydown="navigateSuggestions(event)" onkeyup="searchItems()">
-        <div class="search-wrapper"><div id="suggestions"></div></div>
-        <div id="selected-items"></div>
-        <div class="collapsible-container">
-            <div class="collapsible-header" onclick="toggleCollapse()">
-                <span>Select / View Catagories</span>
-                <span class="chevron"><i class="fa-solid fa-chevron-left"></i></span>
-            </div>
-            <div class="content">
-                <ul id="items-list">
-                    <script>
-                        function generateList(letter) {
-                            let html = <li>
-                                            <span class="collapsible" onclick="toggleSection(this)">
-                                                <span class="toggle-icon">+</span>
-                                                <input type="checkbox" id="checkbox-${letter}" class="checkbox" onchange="updateTags(this)" data-name="${letter}"> ${letter}
-                                            </span>
-                                            <ul class="nested">;
-                            for (let i = 1; i <= 5; i++) {
-                                html += <li>
-                                                <span class="collapsible" onclick="toggleSection(this)">
-                                                    <span class="toggle-icon">+</span>
-                                                    <input type="checkbox" id="checkbox-${letter}${i}" class="checkbox" onchange="updateTags(this)" data-name="${letter}${i}"> ${letter}${i}
-                                                </span>
-                                                <ul class="nested">;
-                                for (let j = 1; j <= 5; j++) {
-                                    html += <li>
-                                                        <span>
-                                                            <input type="checkbox" id="checkbox-${letter}${i}-${j}" class="checkbox" onchange="updateTags(this)" data-name="${letter}${i}-${j}"> ${letter}${i}-${j}
-                                                        </span>
-                                                    </li>;
-                                }
-                                html += </ul></li>;
-                            }
-                            html += </ul></li>;
-                            return html;
-                        }
-
-                        document.write('<ul>');
-                        for (let charCode = 65; charCode <= 90; charCode++) {
-                            document.write(generateList(String.fromCharCode(charCode)));
-                        }
-                        document.write('</ul>');
-                    </script>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <script>
-        let selectedSuggestionIndex = -1;
-
-        function toggleSection(element, forceOpen = false) {
-            let nestedList = element.nextElementSibling;
-            let icon = element.querySelector('.toggle-icon');
-            let chevronElement = element.parentElement.querySelector('.chevron');
-
-            if (nestedList && nestedList.classList.contains('nested')) {
-                let isVisible = nestedList.style.display === 'block';
-                if (forceOpen) {
-                    nestedList.style.display = 'block';
-                    icon.textContent = '−';
-                    if (chevronElement) {
-                        chevronElement.classList.add('rotate');
-                    }
-                } else {
-                    nestedList.style.display = isVisible ? 'none' : 'block';
-                    icon.textContent = isVisible ? '+' : '−';
-                    if (chevronElement) {
-                        chevronElement.classList.toggle('rotate', !isVisible);
-                    }
-                }
-            }
-        }
-
-        function updateTags(checkbox) {
-            let selectedItems = document.getElementById('selected-items');
-            let itemName = checkbox.getAttribute('data-name');
-            if (checkbox.checked) {
-                let tag = document.createElement('span');
-                tag.className = 'tag';
-                tag.textContent = itemName;
-                let removeBtn = document.createElement('span');
-                removeBtn.className = 'remove';
-                removeBtn.textContent = ' ×';
-                removeBtn.onclick = function() {
-                    checkbox.checked = false;
-                    selectedItems.removeChild(tag);
-                };
-                tag.appendChild(removeBtn);
-                selectedItems.appendChild(tag);
-            } else {
-                let tags = document.querySelectorAll('.tag');
-                tags.forEach(tag => {
-                    if (tag.textContent.startsWith(itemName)) {
-                        tag.remove();
-                    }
-                });
-            }
-        }
-
-        function expandToCheckbox(checkbox) {
-            let parent = checkbox.closest('ul');
-            while (parent) {
-                let collapsible = parent.previousElementSibling;
-                if (collapsible && collapsible.classList.contains('collapsible')) {
-                    toggleSection(collapsible, true);
-                }
-                parent = parent.parentElement.closest('ul');
-            }
-        }
-
-        function searchItems() {
-            let query = document.getElementById("search-bar").value.toLowerCase();
-            let suggestions = document.getElementById("suggestions");
-            suggestions.innerHTML = "";
-            selectedSuggestionIndex = -1;
-            if (query === "") {
-                suggestions.style.display = "none";
-                return;
-            }
-            let found = false;
-            document.querySelectorAll(".checkbox").forEach(checkbox => {
-                let name = checkbox.getAttribute("data-name");
-                if (name.toLowerCase().includes(query)) {
-                    let div = document.createElement("div");
-                    div.className = "suggestion";
-                    div.textContent = name;
-                    div.setAttribute("data-checkbox-id", checkbox.id);
-                    div.onclick = function() {
-                        let checkboxId = this.getAttribute("data-checkbox-id");
-                        let checkbox = document.getElementById(checkboxId);
-                        if (checkbox) {
-                            checkbox.checked = true;
-                            updateTags(checkbox);
-                            expandToCheckbox(checkbox);
-                        }
-                        document.getElementById("search-bar").value = "";
-                        suggestions.style.display = "none";
-                        selectedSuggestionIndex = -1;
-                    };
-                    suggestions.appendChild(div);
-                    found = true;
-                }
-            });
-            suggestions.style.display = found ? "block" : "none";
-        }
-
-        function navigateSuggestions(event) {
-            let suggestions = document.getElementById("suggestions");
-            let suggestionList = suggestions.getElementsByClassName("suggestion");
-
-            if (suggestions.style.display === "none" || suggestionList.length === 0) {
-                selectedSuggestionIndex = -1;
-                return;
-            }
-
-            if (event.key === "ArrowDown") {
-                event.preventDefault();
-                selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestionList.length - 1);
-            } else if (event.key === "ArrowUp") {
-                event.preventDefault();
-                selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, 0);
-            } else if (event.key === "Enter" && selectedSuggestionIndex !== -1) {
-                event.preventDefault();
-                let checkboxId = suggestionList[selectedSuggestionIndex].getAttribute("data-checkbox-id");
-                let checkbox = document.getElementById(checkboxId);
-                if (checkbox) {
-                    checkbox.checked = true;
-                    updateTags(checkbox);
-                    expandToCheckbox(checkbox);
-                }
-                document.getElementById("search-bar").value = "";
-                suggestions.style.display = "none";
-                selectedSuggestionIndex = -1;
-            }
-
-            for (let i = 0; i < suggestionList.length; i++) {
-                suggestionList[i].classList.remove("active");
-            }
-            if (selectedSuggestionIndex !== -1) {
-                suggestionList[selectedSuggestionIndex].classList.add("active");
-            }
-        }
-    </script>
-    <script>
-        function toggleCollapse() {
-            const content = document.querySelector(".content");
-            const chevron = document.querySelector(".chevron");
-            content.classList.toggle("expanded");
-            chevron.classList.toggle("rotate");
-            if (content.classList.contains("expanded")) {
-                chevron.style.transform = "rotate(-90deg)";
-            } else {
-                chevron.style.transform = "rotate(0deg)";
-            }
-        }
-    </script>
-</body>
-</html>
-ChatGPT said:
-
-The reason keyboard navigation with arrow keys isn't working in your search suggestions is because the navigateSuggestions(event) function is attached to the onkeydown event, but your filtering logic (searchItems()) is on onkeyup.
-
-This causes the suggestions to not be updated in time for the keyboard navigation to work as expected. More specifically:
-
-    When you press a key, onkeydown fires first.
-    At that time, the suggestions list is still empty or outdated because searchItems() hasn’t run yet.
-    Then onkeyup runs and updates the suggestions.
-
-✅ How to Fix It
-
-Use only onkeydown and handle both the filtering and navigation inside one function or split them smartly with a slight delay.
-Option 1: Merge everything into onkeydown:
-
-<input
-  type="text"
-  id="search-bar"
-  placeholder="Search..."
-  onkeydown="handleSearchAndNavigation(event)">
-
-Then modify the function like this:
-
-function handleSearchAndNavigation(event) {
-    const searchBar = document.getElementById("search-bar");
-    const suggestions = document.getElementById("suggestions");
-    const suggestionList = suggestions.getElementsByClassName("suggestion");
-    const query = searchBar.value.toLowerCase();
-
-    // Arrow key handling
-    if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter") {
-        event.preventDefault();
-        if (suggestions.style.display === "none" || suggestionList.length === 0) return;
-
-        if (event.key === "ArrowDown") {
-            selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestionList.length - 1);
-        } else if (event.key === "ArrowUp") {
-            selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, 0);
-        } else if (event.key === "Enter" && selectedSuggestionIndex !== -1) {
-            const checkboxId = suggestionList[selectedSuggestionIndex].getAttribute("data-checkbox-id");
-            const checkbox = document.getElementById(checkboxId);
-            if (checkbox) {
-                checkbox.checked = true;
-                updateTags(checkbox);
-                expandToCheckbox(checkbox);
-            }
-            searchBar.value = "";
-            suggestions.style.display = "none";
-            selectedSuggestionIndex = -1;
-            return;
-        }
-
-        for (let i = 0; i < suggestionList.length; i++) {
-            suggestionList[i].classList.remove("active");
-        }
-        if (selectedSuggestionIndex !== -1) {
-            suggestionList[selectedSuggestionIndex].classList.add("active");
-        }
-        return;
-    }
-
-    // Regular character input → filter suggestions
-    setTimeout(() => {
-        const newQuery = searchBar.value.toLowerCase();
-        suggestions.innerHTML = "";
-        selectedSuggestionIndex = -1;
-
-        if (newQuery === "") {
-            suggestions.style.display = "none";
-            return;
-        }
-
-        let found = false;
-        document.querySelectorAll(".checkbox").forEach((checkbox) => {
-            const name = checkbox.getAttribute("data-name");
-            if (name.toLowerCase().includes(newQuery)) {
-                const div = document.createElement("div");
-                div.className = "suggestion";
-                div.textContent = name;
-                div.setAttribute("data-checkbox-id", checkbox.id);
-                div.onclick = function () {
-                    checkbox.checked = true;
-                    updateTags(checkbox);
-                    expandToCheckbox(checkbox);
-                    searchBar.value = "";
-                    suggestions.style.display = "none";
-                    selectedSuggestionIndex = -1;
-                };
-                suggestions.appendChild(div);
-                found = true;
-            }
-        });
-
-        suggestions.style.display = found ? "block" : "none";
-    }, 0); // Let keydown finish before updating DOM
-}
-
-Let me know if you want smoother keyboard accessibility (e.g., Escape key to close suggestions, or Tab to jump out cleanly).
-You said:
-can you uopdate the full code—remeber to only modify what is needed and keep everything else the same
-ChatGPT said:
-
-Absolutely — here’s your updated code with only the necessary changes to make keyboard navigation of the search suggestions work.
-✅ What changed:
-
-    Replaced onkeydown="navigateSuggestions(event)" onkeyup="searchItems()"
-    with → onkeydown="handleSearchAndNavigation(event)"
-    Replaced the two separate functions navigateSuggestions() and searchItems()
-    with → a single merged function handleSearchAndNavigation(event)
-
-✅ Here's the only modified part of your HTML:
-🔁 Replace this:
-
-<input type="text" id="search-bar" placeholder="Search..." onkeydown="navigateSuggestions(event)" onkeyup="searchItems()">
-
-✅ With this:
-
-<input type="text" id="search-bar" placeholder="Search..." onkeydown="handleSearchAndNavigation(event)">
-
-✅ Replace the two existing <script> functions searchItems() and navigateSuggestions() with this:
-
-<script>
-    let selectedSuggestionIndex = -1;
-
-    function handleSearchAndNavigation(event) {
-        const searchBar = document.getElementById("search-bar");
-        const suggestions = document.getElementById("suggestions");
-        const suggestionList = suggestions.getElementsByClassName("suggestion");
-
-        // Arrow key navigation
-        if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter") {
-            event.preventDefault();
-
-            if (suggestions.style.display === "none" || suggestionList.length === 0) return;
-
-            if (event.key === "ArrowDown") {
-                selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestionList.length - 1);
-            } else if (event.key === "ArrowUp") {
-                selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, 0);
-            } else if (event.key === "Enter" && selectedSuggestionIndex !== -1) {
-                const checkboxId = suggestionList[selectedSuggestionIndex].getAttribute("data-checkbox-id");
-                const checkbox = document.getElementById(checkboxId);
-                if (checkbox) {
-                    checkbox.checked = true;
-                    updateTags(checkbox);
-                    expandToCheckbox(checkbox);
-                }
-                searchBar.value = "";
-                suggestions.style.display = "none";
-                selectedSuggestionIndex = -1;
-                return;
-            }
-
-            for (let i = 0; i < suggestionList.length; i++) {
-                suggestionList[i].classList.remove("active");
-            }
-            if (selectedSuggestionIndex !== -1) {
-                suggestionList[selectedSuggestionIndex].classList.add("active");
-            }
-            return;
-        }
-
-        // Handle text input for live search
-        setTimeout(() => {
-            const query = searchBar.value.toLowerCase();
-            suggestions.innerHTML = "";
-            selectedSuggestionIndex = -1;
-
-            if (query === "") {
-                suggestions.style.display = "none";
-                return;
-            }
-
-            let found = false;
-            document.querySelectorAll(".checkbox").forEach((checkbox) => {
-                const name = checkbox.getAttribute("data-name");
-                if (name.toLowerCase().includes(query)) {
-                    const div = document.createElement("div");
-                    div.className = "suggestion";
-                    div.textContent = name;
-                    div.setAttribute("data-checkbox-id", checkbox.id);
-                    div.onclick = function () {
-                        checkbox.checked = true;
-                        updateTags(checkbox);
-                        expandToCheckbox(checkbox);
-                        searchBar.value = "";
-                        suggestions.style.display = "none";
-                        selectedSuggestionIndex = -1;
-                    };
-                    suggestions.appendChild(div);
-                    found = true;
-                }
-            });
-
-            suggestions.style.display = found ? "block" : "none";
-        }, 0);
-    }
-</script>
-
-Everything else in your code remains untouched. Let me know if you’d like Escape key support or the ability to reset the index when clicking outside the input.
-You said:
-no—give me ALL the code—i cant copy and paste pieces right now
-ChatGPT said:
-
-Got it! Here's your full HTML file with only the necessary changes to support keyboard navigation for the search suggestions using arrow keys and Enter. Everything else remains exactly as you wrote it.
-✅ Full working code:
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -725,7 +135,7 @@ Got it! Here's your full HTML file with only the necessary changes to support ke
             transition: transform 0.3s ease;
             display: inline-block;
             font-size: 20px;
-            transform: rotate(0deg);
+            transform: rotate(0deg); /* Initial rotation set to 0 degrees */
         }
 
         .content {
@@ -755,7 +165,7 @@ Got it! Here's your full HTML file with only the necessary changes to support ke
         }
 
         .rotate {
-            transform: rotate(90deg);
+            transform: rotate(90deg); /* Rotate 90 degrees for down state */
         }
 
         .main-wrapper {
@@ -773,6 +183,7 @@ Got it! Here's your full HTML file with only the necessary changes to support ke
 <body>
     <div class="main-wrapper">
         <h2 style="margin-bottom: 15px; display: block;">Catagories</h2>
+        <!-- CHANGED to single event for search + navigation -->
         <input type="text" id="search-bar" placeholder="Search..." onkeydown="handleSearchAndNavigation(event)">
         <div class="search-wrapper"><div id="suggestions"></div></div>
         <div id="selected-items"></div>
@@ -850,19 +261,45 @@ Got it! Here's your full HTML file with only the necessary changes to support ke
         function updateTags(checkbox) {
             let selectedItems = document.getElementById('selected-items');
             let itemName = checkbox.getAttribute('data-name');
+
             if (checkbox.checked) {
                 let tag = document.createElement('span');
                 tag.className = 'tag';
                 tag.textContent = itemName;
+
+                // Store the checkbox's ID so we can scroll to it later.
+                tag.setAttribute('data-checkbox-id', checkbox.id);
+
+                // Create the '×' remove button
                 let removeBtn = document.createElement('span');
                 removeBtn.className = 'remove';
                 removeBtn.textContent = ' ×';
-                removeBtn.onclick = function () {
+                removeBtn.onclick = function() {
                     checkbox.checked = false;
                     selectedItems.removeChild(tag);
                 };
                 tag.appendChild(removeBtn);
+
+                // ------------------------
+                // NEW: When the *blue area* of the tag is clicked, expand & scroll to its checkbox
+                // ------------------------
+                tag.onclick = function(e) {
+                    // If the target *is* the remove button, do nothing special:
+                    if (e.target === removeBtn) return;
+
+                    // Otherwise, expand the tree to this checkbox and scroll into view
+                    expandToCheckbox(checkbox);
+                    const itemElement = document.getElementById(checkbox.id);
+                    if (itemElement) {
+                        itemElement.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+                    }
+                };
+
                 selectedItems.appendChild(tag);
+
             } else {
                 let tags = document.querySelectorAll('.tag');
                 tags.forEach(tag => {
@@ -880,7 +317,7 @@ Got it! Here's your full HTML file with only the necessary changes to support ke
                 if (collapsible && collapsible.classList.contains('collapsible')) {
                     toggleSection(collapsible, true);
                 }
-                parent = parent.parentElement.closest('ul');
+                parent = parent.parentElement && parent.parentElement.closest('ul');
             }
         }
 
