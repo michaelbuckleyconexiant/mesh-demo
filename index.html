@@ -8,9 +8,7 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
   <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
     * {
       box-sizing: border-box;
@@ -20,7 +18,6 @@
     }
     html {
       font-size: 16px;
-
     }
     body {
       font-family: "Poppins", sans-serif;
@@ -42,10 +39,10 @@
     li {
       margin-bottom: 5px;
     }
-p {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
+    p {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
     .collapsible {
       cursor: pointer;
       display: flex;
@@ -110,6 +107,7 @@ p {
       margin-bottom: 10px;
       font-size: 16px;
       display: block;
+      font-family:Poppins, sans-serif, FontAwesome;
     }
 
     #suggestions {
@@ -158,7 +156,7 @@ p {
       transition: transform 0.3s ease;
       display: inline-block;
       font-size: 20px;
-      transform: rotate(0deg); /* Initial rotation set to 0 degrees */
+      transform: rotate(0deg); /* Initial rotation */
     }
 
     .content {
@@ -203,21 +201,13 @@ p {
       position: relative;
     }
 
-    /*
-      Only highlight the direct line (the .collapsible span) when checked.
-      This ensures the children won't inherit the background color.
-    */
-    li.checked {
-      /* remove the default li highlight if you prefer. */
-      /* background-color: #d0ebff; */
-    }
-
     li.checked > .collapsible {
-      background-color: #d0ebff; /* highlight only the parent row */
+      background-color: #d0ebff; 
       border-radius: 6px;
       padding: 4px;
       margin-left: -4px;
     }
+
     .mesh-small-text {
       font-size: .8rem;
       line-height: 1.2;
@@ -228,31 +218,27 @@ p {
     p {
       margin-bottom: 30px;
       line-height: 1.5;
-      columns: #333;
+      color: #333;
     }
     input {
       border: solid 1px #ccc;
       border-radius: 0;
     }
     #clear-button {
-  background-color: #dc3545; /* Red */
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: normal;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-family: "Poppins", sans-serif;
-
-}
-
-#clear-button:hover {
-  background-color: #c82333; /* Darker red on hover */
-}
-
-
+      background-color: #dc3545; /* Red */
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: normal;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-family: "Poppins", sans-serif;
+    }
+    #clear-button:hover {
+      background-color: #c82333; /* Darker red on hover */
+    }
   </style>
 </head>
 <body>
@@ -260,15 +246,17 @@ p {
   <div class="main-wrapper">
     <h1 style="margin-bottom: 15px; display: block;">MeSH Search & Tag</h1>
     <p>Use the search bar below to select categories or manually select from the full Medical Subject Headings (MeSH) tree.</p>
-    <p><a href="https://www.nlm.nih.gov/mesh/meshhome.html" target="_blank">Learn more about MeSH <i class="fa-solid fa-up-right-from-square"></i></a></p>
-    
-
+    <p>
+      <a href="https://www.nlm.nih.gov/mesh/meshhome.html" target="_blank">
+        Learn more about MeSH 
+        <i class="fa-solid fa-up-right-from-square"></i>
+      </a>
+    </p>
     
     <input
       type="text"
       id="search-bar"
       placeholder="&#xF002; Search..."
-      style="font-family:Poppins, sans-serif, FontAwesome"
       onkeydown="handleSearchAndNavigation(event)"/>
 
     <div class="search-wrapper">
@@ -282,13 +270,10 @@ p {
       Clear All Selections&nbsp;&nbsp;<i class="fa-solid fa-trash"></i>
     </button>
     
-
     <div class="collapsible-container">
       <div class="collapsible-header" onclick="toggleCollapse()">
         <span><i class="fa-solid fa-sitemap"></i>&nbsp;&nbsp;Select from full MeSH tree</span>
-        <span class="chevron"
-          ><i class="fa-solid fa-chevron-left"></i
-        ></span>
+        <span class="chevron"><i class="fa-solid fa-chevron-left"></i></span>
       </div>
       <div class="content">
         <ul id="items-list">
@@ -321,11 +306,11 @@ p {
                     {
                       name: "Tissues",
                       children: [
-                           {name: "Epithelial Tissue"},
-                           {name: "Connective Tissue"},
-                           {name: "Muscle Tissue"},
-                           {name: "Nervous Tissue"}
-                      ]
+                        { name: "Epithelial Tissue" },
+                        { name: "Connective Tissue" },
+                        { name: "Muscle Tissue" },
+                        { name: "Nervous Tissue" }
+                      ],
                     }
                   ],
                 },
@@ -360,7 +345,8 @@ p {
                     {
                       name: "Animals",
                       children: [
-                        { name: "Mammals",
+                        {
+                          name: "Mammals",
                           children: [
                             { name: "Primates" },
                             { name: "Rodents" },
@@ -372,11 +358,11 @@ p {
                         { name: "Fish" },
                       ],
                     },
-                     {
+                    {
                       name: "Plants",
-                      children:[
-                          {name:"Angiosperms"},
-                          {name:"Gymnosperms"}
+                      children: [
+                        { name: "Angiosperms" },
+                        { name: "Gymnosperms" }
                       ]
                     }
                   ],
@@ -398,7 +384,7 @@ p {
                         },
                         {
                           name: "Viral Infections",
-                          children:[
+                          children: [
                             { name: "Influenza (Flu)" },
                             { name: "HIV Infection (AIDS)" },
                             { name: "Hepatitis (Liver inflammation)" }
@@ -441,7 +427,7 @@ p {
                       name: "Nervous System Diseases",
                       displayName: "Nervous System Diseases",
                       children: [
-                        { name:"Alzheimer's Disease (Memory loss)" },
+                        { name: "Alzheimer's Disease (Memory loss)" },
                         { name: "Parkinson's Disease (Movement disorder)" },
                         { name: "Epilepsy (Seizures)" },
                         { name: "Multiple Sclerosis (Nerve damage)" }
@@ -451,17 +437,18 @@ p {
                       name: "Mental Disorders",
                       displayName: "Mental Disorders",
                       children: [
-                        { name:"Depression (Mood disorder)" },
-                        { name:"Anxiety Disorders" },
-                        { name:"Schizophrenia" },
-                        { name:"Bipolar Disorder (Manic depression)" }
+                        { name: "Depression (Mood disorder)" },
+                        { name: "Anxiety Disorders" },
+                        { name: "Schizophrenia" },
+                        { name: "Bipolar Disorder (Manic depression)" }
                       ]
                     },
                     {
                       name: "Immune System Diseases",
                       displayName: "Immune System Diseases",
                       children: [
-                        { name: "Autoimmune Diseases",
+                        {
+                          name: "Autoimmune Diseases",
                           children: [
                             { name: "Rheumatoid Arthritis (Joint inflammation)" },
                             { name: "Lupus (Connective tissue disease)" }
@@ -501,26 +488,26 @@ p {
                     {
                       name: "Musculoskeletal Diseases",
                       displayName: "Musculoskeletal Diseases",
-                      children:[
-                        { name:"Arthritis (Joint inflammation)" },
-                        { name:"Osteoporosis (Weak bones)" }
+                      children: [
+                        { name: "Arthritis (Joint inflammation)" },
+                        { name: "Osteoporosis (Weak bones)" }
                       ]
                     },
                     {
                       name: "Urogenital Diseases",
                       displayName: "Urogenital Diseases",
                       children: [
-                        { name:"Kidney Diseases" },
-                        { name:"Urinary Tract Infections (UTIs)" },
-                        { name:"Sexually Transmitted Diseases (STDs)" }
+                        { name: "Kidney Diseases" },
+                        { name: "Urinary Tract Infections (UTIs)" },
+                        { name: "Sexually Transmitted Diseases (STDs)" }
                       ]
                     },
                     {
                       name: "Congenital Disorders",
                       displayName: "Congenital Disorders (Birth defects)",
                       children: [
-                        { name:"Down Syndrome" },
-                        { name:"Cystic Fibrosis" },
+                        { name: "Down Syndrome" },
+                        { name: "Cystic Fibrosis" },
                         { name: "Spina Bifida" }
                       ]
                     },
@@ -554,7 +541,7 @@ p {
                         { name: "Hydrocarbons" },
                         { name: "Alcohols" },
                         { name: "Aldehydes" },
-                         { name:"Ketones" },
+                        { name: "Ketones" },
                         { name: "Carboxylic Acids" },
                         { name: "Amines" },
                         { name: "Amides" },
@@ -621,9 +608,9 @@ p {
                     },
                     {
                       name: "Rehabilitation",
-                      children:[
-                          { name: "Occupational Therapy" },
-                          { name: "Speech Therapy" }
+                      children: [
+                        { name: "Occupational Therapy" },
+                        { name: "Speech Therapy" }
                       ]
                     },
                     {
@@ -797,7 +784,7 @@ p {
                         { name: "Radiation" }
                       ]
                     },
-                     {
+                    {
                       name: "Chemical Phenomena",
                       children: [
                         { name: "Catalysis" },
@@ -817,7 +804,7 @@ p {
                     }
                   ]
                 },
-                 {
+                {
                   name: "Publications",
                   children: [
                     { name: "Journal Articles" },
@@ -942,7 +929,7 @@ p {
                     { name: "Years" },
                     { name: "Months" },
                     { name: "Days" },
-                     { name: "Hours" },
+                    { name: "Hours" },
                     { name: "Minutes" },
                     { name: "Seconds" }
                   ]
@@ -1017,12 +1004,18 @@ p {
                   name: "Legislation",
                   displayName: "Legislation (Laws)",
                   children: [
-                    { name: "Health Legislation",
-                      displayName: "Health Legislation (Laws about health)" },
-                    { name: "Drug Legislation",
-                      displayName: "Drug Legislation (Laws about medicines)" },
-                    { name: "Environmental Legislation",
-                      displayName: "Environmental Legislation (Laws about the environment)" }
+                    {
+                      name: "Health Legislation",
+                      displayName: "Health Legislation (Laws about health)"
+                    },
+                    {
+                      name: "Drug Legislation",
+                      displayName: "Drug Legislation (Laws about medicines)"
+                    },
+                    {
+                      name: "Environmental Legislation",
+                      displayName: "Environmental Legislation (Laws about the environment)"
+                    }
                   ]
                 },
                 {
@@ -1136,9 +1129,11 @@ p {
                     item.id ||
                     `${item.name.replace(/[^a-zA-Z0-9]/g, "")} -${level}-${index}`;
                   const displayName = item.displayName || item.name;
-                  html += `${indent}<li>\n${indent}    <span class="collapsible" onclick="toggleSection(this, event)">\n${indent}        <span class="toggle-icon">+</span>\n${indent}        <input type="checkbox" id="checkbox-${itemId}" class="checkbox" onchange="updateTags(this)" data-name="${item.name}"> ${displayName}\n${indent}    </span>`;
+                  html += `${indent}<li>\n${indent}    <span class="collapsible" onclick="toggleSection(this, event)">\n`;
+                  html += `${indent}        <span class="toggle-icon">+</span>\n`;
+                  html += `${indent}        <input type="checkbox" id="checkbox-${itemId}" class="checkbox" onchange="updateTags(this)" data-name="${item.name}"> ${displayName}\n${indent}    </span>`;
                   if (item.children && item.children.length > 0) {
-                    html += `${indent}    <ul class="nested">\n`;
+                    html += `\n${indent}    <ul class="nested">\n`;
                     html += createListHTML(item.children, level + 1);
                     html += `${indent}    </ul>\n`;
                   }
@@ -1147,7 +1142,7 @@ p {
                 return html;
               }
 
-              return createListHTML(categories);
+              document.write(createListHTML(categories));
             }
 
             document.write(generateMeshList());
@@ -1156,6 +1151,7 @@ p {
       </div>
     </div>
   </div>
+
   <script>
     let selectedSuggestionIndex = -1;
 
@@ -1189,12 +1185,9 @@ p {
     function updateTags(checkbox) {
       let selectedItems = document.getElementById("selected-items");
       let itemName = checkbox.getAttribute("data-name");
-
-      // NEW: Get the parent <li>
       const liParent = checkbox.closest("li");
 
       if (checkbox.checked) {
-        // NEW: Add the "checked" class to <li>
         liParent.classList.add("checked");
 
         let tag = document.createElement("span");
@@ -1211,8 +1204,6 @@ p {
         removeBtn.onclick = function () {
           checkbox.checked = false;
           selectedItems.removeChild(tag);
-
-          // NEW: remove the "checked" class
           liParent.classList.remove("checked");
         };
         tag.appendChild(removeBtn);
@@ -1220,7 +1211,15 @@ p {
         // When the blue area of the tag is clicked, expand & scroll to checkbox
         tag.onclick = function (e) {
           if (e.target === removeBtn) return;
+
+          // Open the main collapsible if closed
+          const content = document.querySelector(".content");
+          if (!content.classList.contains("expanded")) {
+            toggleCollapse();
+          }
+
           expandToCheckbox(checkbox);
+
           const itemElement = document.getElementById(checkbox.id);
           if (itemElement) {
             itemElement.scrollIntoView({
@@ -1232,8 +1231,7 @@ p {
 
         selectedItems.appendChild(tag);
       } else {
-        // Unchecked scenario
-        liParent.classList.remove("checked"); // NEW: remove highlight
+        liParent.classList.remove("checked");
 
         let tags = document.querySelectorAll(".tag");
         tags.forEach((tag) => {
@@ -1339,6 +1337,7 @@ p {
       }, 0);
     }
 
+    // Toggles the main collapsible container
     function toggleCollapse() {
       const content = document.querySelector(".content");
       const chevron = document.querySelector(".chevron");
@@ -1352,11 +1351,9 @@ p {
     }
   </script>
 
-<!-- clear / reset script -->
-
-<script>
-
-function clearAllSelections() {
+  <!-- clear / reset script -->
+  <script>
+    function clearAllSelections() {
       // Uncheck all checkboxes and remove "checked" highlights
       const checkboxes = document.querySelectorAll(".checkbox");
       checkboxes.forEach((checkbox) => {
@@ -1373,12 +1370,11 @@ function clearAllSelections() {
       document.querySelectorAll(".nested").forEach((ul) => {
         ul.style.display = "none";
       });
-
       document.querySelectorAll(".toggle-icon").forEach((icon) => {
         icon.textContent = "+";
       });
 
-      // Reset chevron in header
+      // Collapse main collapsible if open
       const content = document.querySelector(".content");
       const chevron = document.querySelector(".chevron");
       content.classList.remove("expanded");
@@ -1405,9 +1401,7 @@ function clearAllSelections() {
     observer.observe(document.getElementById("selected-items"), {
       childList: true,
     });
-
-
-</script>
+  </script>
 
 </body>
 </html>
