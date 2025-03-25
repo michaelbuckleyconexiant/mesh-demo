@@ -8,17 +8,27 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
   <style>
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       scroll-behavior: smooth;
     }
+    html {
+      font-size: 16px;
 
+    }
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Poppins", sans-serif;
       background-color: #f4f4f4;
       margin: 0;
+    }
+    span {
+      padding: 0;
     }
 
     ul {
@@ -28,7 +38,9 @@
     li {
       margin-bottom: 5px;
     }
-
+p {
+  font-size: 1rem;
+}
     .collapsible {
       cursor: pointer;
       display: flex;
@@ -43,7 +55,7 @@
       margin-right: 8px;
       text-align: center;
       font-weight: bold;
-      background: #007bff;
+      background: black;
       color: white;
       border-radius: 50%;
       line-height: 15px;
@@ -78,6 +90,7 @@
       color: white;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 14px;
     }
 
     .tag .remove {
@@ -133,7 +146,7 @@
       padding: 12px 16px;
       cursor: pointer;
       font-size: 16px;
-      font-weight: bold;
+      font-weight: normal;
     }
 
     .chevron {
@@ -203,8 +216,8 @@
     .mesh-small-text {
       font-size: .8rem;
       line-height: 1.2;
-      margin-bottom: 15px;
-      margin-top: 15px;
+      margin-bottom: 25px;
+      margin-top: 20px;
       color: #666;
     }
     p {
@@ -216,28 +229,53 @@
       border: solid 1px #ccc;
       border-radius: 0;
     }
+    #clear-button {
+  background-color: #dc3545; /* Red */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: normal;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: "Poppins", sans-serif;
+
+}
+
+#clear-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
 
   </style>
 </head>
 <body>
   <div class="main-wrapper">
-    <h2 style="margin-bottom: 15px; display: block;"><i class="fa-solid fa-magnifying-glass"></i> Categories (MeSH)</h2>
-    <p>Use the search bar to find and add categories, or manually explore the full category hierarchy.</p>
+    <h1 style="margin-bottom: 15px; display: block;">MeSH Search & Tag </h1>
+    <p>Use the search bar to select categories or manually select from the full Medical Subject Headings (MeSH) hierarchy.</p>
     <input
       type="text"
       id="search-bar"
       placeholder="Search..."
       onkeydown="handleSearchAndNavigation(event)"/>
 
-      <p class="mesh-small-text">Click on active tags to navigate the full category hierarchy..</p>
 
     <div class="search-wrapper">
       <div id="suggestions"></div>
     </div>
     <div id="selected-items"></div>
+
+    <p class="mesh-small-text">Click on active tags to navigate the full category hierarchy.</p>
+
+    <button id="clear-button" onclick="clearAllSelections()" style="margin-bottom: 20px; display: none;">
+      Clear All Selections <i class="fa-solid fa-trash"></i>
+    </button>
+    
+
     <div class="collapsible-container">
       <div class="collapsible-header" onclick="toggleCollapse()">
-        <span>Full Category Hierarchy.</span>
+        <span>Select From Full MeSH Hierarchy</span>
         <span class="chevron"
           ><i class="fa-solid fa-chevron-left"></i
         ></span>
@@ -1303,5 +1341,63 @@
       }
     }
   </script>
+
+<!-- clear / reset script -->
+
+<script>
+
+function clearAllSelections() {
+      // Uncheck all checkboxes and remove "checked" highlights
+      const checkboxes = document.querySelectorAll(".checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+        const liParent = checkbox.closest("li");
+        if (liParent) liParent.classList.remove("checked");
+      });
+
+      // Remove all tags
+      const selectedItems = document.getElementById("selected-items");
+      selectedItems.innerHTML = "";
+
+      // Collapse all nested sections
+      document.querySelectorAll(".nested").forEach((ul) => {
+        ul.style.display = "none";
+      });
+
+      document.querySelectorAll(".toggle-icon").forEach((icon) => {
+        icon.textContent = "+";
+      });
+
+      // Reset chevron in header
+      const content = document.querySelector(".content");
+      const chevron = document.querySelector(".chevron");
+      content.classList.remove("expanded");
+      chevron.classList.remove("rotate");
+      chevron.style.transform = "rotate(0deg)";
+
+      // Clear the search bar
+      document.getElementById("search-bar").value = "";
+
+      // Hide suggestions dropdown if open
+      document.getElementById("suggestions").style.display = "none";
+
+      // Hide the Clear All button
+      document.getElementById("clear-button").style.display = "none";
+    }
+
+    // Show or hide the clear button based on whether tags exist
+    const observer = new MutationObserver(() => {
+      const tagCount = document.querySelectorAll("#selected-items .tag").length;
+      const clearButton = document.getElementById("clear-button");
+      clearButton.style.display = tagCount > 0 ? "block" : "none";
+    });
+
+    observer.observe(document.getElementById("selected-items"), {
+      childList: true,
+    });
+
+
+</script>
+
 </body>
 </html>
